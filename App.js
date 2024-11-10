@@ -8,6 +8,8 @@ import Register from './components/Register';
 import Profile from './components/Profile';
 import AddItem from './components/AddItem';
 import "./global.css";
+import ItemDetail from './components/ItemDetail';
+import Barter from './components/Barter';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +34,8 @@ export default function App() {
             headerTitleAlign: 'center'
           }}
         />
+        <Stack.Screen name="ItemDetail" component={ItemDetail} options={{ headerShown: false }} />
+        <Stack.Screen name="Barter" component={Barter} options={{ headerTitleAlign: 'center' }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
