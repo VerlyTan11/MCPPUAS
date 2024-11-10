@@ -1,6 +1,7 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ItemsProp from './ItemsProp';
+import FloatingAddButton from './FloatingAddButton';
 
 const Home = ({ navigation }) => {
     return (
@@ -73,6 +74,8 @@ const Home = ({ navigation }) => {
             <View>
                 <ItemsProp />
             </View>
+
+            <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
         </View>
     );
 }

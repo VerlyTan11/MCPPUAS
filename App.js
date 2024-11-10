@@ -6,7 +6,8 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
-import "./global.css"
+import AddItem from './components/AddItem';
+import "./global.css";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,10 +20,18 @@ export default function App() {
           component={Splash}  
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
-        <Stack.Screen name="Register" component={Register} options={{ headerShown: false }}/>
-        <Stack.Screen name="Home" component={Home} options={{ headerShown: false }}/>
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="AddItem" 
+          component={AddItem} 
+          options={{ 
+            title: "Posting Item's",
+            headerTitleAlign: 'center'
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

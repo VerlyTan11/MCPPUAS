@@ -58,6 +58,8 @@ const Profile = () => {
         <View className="mx-4">
             <ItemsProp/>
         </View>
+
+        <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
     </View>
   );
 };
