@@ -10,6 +10,10 @@ import AddItem from './components/AddItem';
 import "./global.css";
 import ItemDetail from './components/ItemDetail';
 import Barter from './components/Barter';
+import ChatStart from './components/ChatStart';
+import ChatScreen from './components/ChatScreen';
+import EditProfile from './components/EditProfile';
+import EditItem from './components/EditItem';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +30,8 @@ export default function App() {
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+        <Stack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
+        <Stack.Screen name="EditItem" component={EditItem} options={{ headerShown: false }} />
         <Stack.Screen 
           name="AddItem" 
           component={AddItem} 
@@ -36,6 +42,8 @@ export default function App() {
         />
         <Stack.Screen name="ItemDetail" component={ItemDetail} options={{ headerShown: false }} />
         <Stack.Screen name="Barter" component={Barter} options={{ headerTitleAlign: 'center' }}/>
+        <Stack.Screen name="ChatStart" component={ChatStart} options={{headerShown: false}}/>
+        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

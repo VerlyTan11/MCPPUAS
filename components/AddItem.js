@@ -9,7 +9,7 @@ const AddItem = () => {
                 <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
                     <TouchableOpacity>
                         <Image 
-                            source={require('../assets/logo-bartems.png')}
+                            source={require('../assets/plus.png')}
                             className="w-6 h-6"
                             resizeMode="contain"
                         />

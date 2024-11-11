@@ -10,7 +10,7 @@ const ItemDetail = () => {
         <ScrollView className="flex-1 bg-white p-8 mt-8">
             <View className="flex-row items-center mb-4">
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={require('../assets/Back.png')} className="w-10 h-10" />
+                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
                 </TouchableOpacity>
             </View>
 
@@ -23,12 +23,17 @@ const ItemDetail = () => {
             <View className="flex-row justify-between items-center mb-4">
                 <View className="flex-row items-center">
                     <Image 
-                    source={require('../assets/logo-bartems.png')}
-                    className="w-10 h-10 rounded-full mr-3"
+                        source={require('../assets/foto-aldo.jpeg')}
+                        className="w-10 h-10 rounded-full mr-3"
                     />
                     <Text className="text-gray-800 font-semibold">Aldo Wijaya</Text>
                 </View>
-                <TouchableOpacity className="bg-blue-950 rounded-full w-14 h-8 items-center justify-center">
+
+                {/* Wrap the chat icon in TouchableOpacity for navigation */}
+                <TouchableOpacity 
+                    className="bg-blue-950 rounded-full w-14 h-8 items-center justify-center"
+                    onPress={() => navigation.navigate('ChatStart')} // Move onPress here
+                >
                     <Image 
                         source={require('../assets/Chat.png')}
                         className="w-6 h-6"

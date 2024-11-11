@@ -44,13 +44,13 @@ const Register = () => {
                 />
             </View>
             
-            <TouchableOpacity className="w-full bg-gray-100 p-3 mb-4 rounded-full">
+            <TouchableOpacity onPress={() => navigation.navigate('Login')} className="w-full bg-gray-100 p-3 mb-4 rounded-full">
                 <Text className="text-gray-500 text-center">Create an account</Text>
             </TouchableOpacity>
             
             <TouchableOpacity onPress={() => navigation.navigate('Login')} className="flex-row">
                 <Text className="text-gray-600">Have an account?</Text>
-                <Text className="text-black font-bold">Login</Text>
+                <Text className="text-black font-bold"> Login</Text>
             </TouchableOpacity>
         </View>
     );
