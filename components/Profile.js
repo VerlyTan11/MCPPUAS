@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import ItemsProp from './ItemsProp';
+import ItemsPropEditItem from './ItemsPropEditItem';
 import FloatingAddButton from './FloatingAddButton';
 
 const Profile = () => {
@@ -75,7 +75,7 @@ const Profile = () => {
       </View>
 
       <View className="mx-4">
-        <ItemsProp/>
+        <ItemsPropEditItem/>
       </View>
 
       <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />

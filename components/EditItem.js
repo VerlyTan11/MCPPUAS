@@ -1,42 +1,99 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const EditItem = ({ route, navigation }) => {
-    const { image, title, itemId } = route.params; // Receive the data passed from ItemsProp
+const EditItem = () => {
+    const navigation = useNavigation();
 
-    const [newTitle, setNewTitle] = useState(title);
-
-    useEffect(() => {
-        // You can initialize your form or fetch other data based on the itemId if necessary
-    }, [itemId]);
-
-    const handleSave = () => {
-        // Save changes or update the item
-        alert(`Item saved: ${newTitle}`);
-        navigation.goBack(); // Navigate back after saving
+    // Function to show delete confirmation pop-up
+    const showDeleteConfirmation = () => {
+        Alert.alert(
+            'Delete Item', // Title of the alert
+            'Are you sure you want to delete this item?', // Message of the alert
+            [
+                {
+                    text: 'No', // No option
+                    onPress: () => console.log('Delete canceled'), // Optional: log or handle the "No" action
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes', // Yes option
+                    onPress: () => console.log('Item deleted'), // Action for "Yes"
+                },
+            ],
+            { cancelable: true }
+        );
     };
 
     return (
-        <View className="flex-1 p-8 bg-white">
-            <Text className="text-2xl font-bold text-black mb-8">Edit Item</Text>
+        <ScrollView className="flex-1 bg-white p-8 mt-8">
+            {/* Header with Back and Delete Icons */}
+            <View className="flex-row items-center justify-between mb-4">
+                {/* Back Icon */}
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
+                </TouchableOpacity>
 
-            <Image 
-                source={image ? { uri: image } : require('../assets/kardus.jpg')}
-                className="w-full h-40 rounded-lg mb-4" 
-                resizeMode="cover"
-            />
+                {/* Delete Icon */}
+                <TouchableOpacity 
+                    onPress={showDeleteConfirmation} // Call the function to show the pop-up
+                    className="bg-gray-200 rounded-full p-1"
+                    style={{ width: 32, height: 32, justifyContent: 'center', alignItems: 'center' }}
+                >
+                    <Image 
+                        source={require('../assets/delete-black.png')}
+                        className="w-6 h-6"
+                    />
+                </TouchableOpacity>
+            </View>
 
-            <Text className="text-xl font-bold text-black mb-4">Title</Text>
-            <TextInput
-                value={newTitle}
-                onChangeText={setNewTitle}
-                className="h-12 p-3 border-b border-gray-300 rounded mb-6"
-            />
+            {/* Main Content */}
+            <View className="relative">
+                <Image 
+                    source={require('../assets/kardus.jpg')}
+                    className="w-full h-64 rounded-lg mb-4"
+                    resizeMode="cover"
+                />
+            </View>
 
-            <TouchableOpacity onPress={handleSave} className="w-full bg-blue-500 p-3 rounded-full">
-                <Text className="text-white text-center">Save</Text>
-            </TouchableOpacity>
-        </View>
+            <View className="flex-row justify-between items-center mb-4">
+                <View className="flex-row items-center">
+                    <Image 
+                        source={require('../assets/foto-aldo.jpeg')}
+                        className="w-10 h-10 rounded-full mr-3"
+                    />
+                    <Text className="text-gray-800 font-semibold">Aldo Wijaya</Text>
+                </View>
+            </View>
+
+            <Text className="text-xl font-semibold text-gray-800 mb-2">Kardus</Text>
+            <Text className="text-gray-500 mb-4">Diunggah 1 jam yang lalu</Text>
+
+            <View className="flex-row space-x-2 mb-4">
+                <Text className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs">Barter Online</Text>
+                <Text className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs">Best Product</Text>
+            </View>
+
+            <Text className="text-gray-800 mb-4">
+                Kardus is an ideal solution for creating a cozy atmosphere in your home. This stylish and functional lighting element provides comfortable ...
+                <Text className="text-blue-500"> Read more</Text>
+            </Text>
+
+            <LinearGradient 
+                colors={['#697565', '#ECDFCC']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1.2, y: 0 }}
+                className="flex-row items-center justify-center p-4 rounded-lg mb-6"
+            >
+                <TouchableOpacity 
+                    className="flex-1 items-center justify-center"
+                    onPress={() => navigation.navigate('PageEdit')}
+                >
+                    <Text className="text-center text-white font-semibold">Edit</Text>
+                </TouchableOpacity>
+            </LinearGradient>
+        </ScrollView>
     );
 };
 
