@@ -6,53 +6,40 @@ const ChatScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      
-      {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#ddd', justifyContent: 'center', marginTop: 20 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ position: 'absolute', left: 16 }}>
-            <Image source={require('../assets/back.png')} style={{ width: 24, height: 24 }} />
+    <View className="flex-1 bg-white mt-8 py-8">
+      <View className="flex-row items-center justify-between px-4 mb-4">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image source={require('../assets/Back.png')} className="w-10 h-10" />
         </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Chat for deal!</Text>
-    </View>
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-gray-600 font-semibold mr-10 text-lg">Chat with deal!</Text>
+        </View>
+      </View>
 
-
-      {/* Profile Section */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#ddd', justifyContent: 'center' }}>
+      <View className="flex-row items-center px-4 py-4 border-b border-gray-300 justify-center">
         <Image
           source={require('../assets/foto-aldo.jpeg')}
-          style={{ width: 50, height: 50, borderRadius: 25, marginRight: 16 }}
+          className="w-12 h-12 rounded-full mr-4"
         />
-        <Text style={{ fontSize: 16, fontWeight: '600' }}>Aldo Wijaya</Text>
+        <Text className="text-lg font-semibold">Aldo Wijaya</Text>
       </View>
 
-      {/* Chat Area */}
-      <View style={{ flex: 1, padding: 16 }}>
-        {/* Empty chat area, you can add chat bubbles here */}
+      <View className="flex-1 px-4 py-2">
       </View>
 
-      {/* Message Input Area */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 8, borderTopWidth: 1, borderTopColor: '#ddd' }}>
+      <View className="flex-row items-center px-4 py-2 border-t border-gray-300">
         <TextInput
-          style={{
-            flex: 1,
-            height: 40,
-            paddingHorizontal: 16,
-            borderWidth: 1,
-            borderColor: '#ddd',
-            borderRadius: 20,
-            marginRight: 8,
-          }}
+          className="flex-1 h-10 px-4 border border-gray-300 rounded-full mr-2"
           placeholder="Write a message"
         />
-        <TouchableOpacity style={{ marginRight: 8 }}>
-          <Image source={require('../assets/emoticon.png')} style={{ width: 24, height: 24 }} />
+        <TouchableOpacity className="mr-2">
+          <Image source={require('../assets/emoticon.png')} className="w-6 h-6" />
         </TouchableOpacity>
-        <TouchableOpacity style={{ marginRight: 8 }}>
-          <Image source={require('../assets/attach-file.png')} style={{ width: 24, height: 24 }} />
+        <TouchableOpacity className="mr-2">
+          <Image source={require('../assets/attach-file.png')} className="w-6 h-6" />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Image source={require('../assets/send.png')} style={{ width: 24, height: 24 }} />
+          <Image source={require('../assets/send.png')} className="w-6 h-6" />
         </TouchableOpacity>
       </View>
     </View>

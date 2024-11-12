@@ -6,20 +6,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 const EditItem = () => {
     const navigation = useNavigation();
 
-    // Function to show delete confirmation pop-up
     const showDeleteConfirmation = () => {
         Alert.alert(
-            'Delete Item', // Title of the alert
-            'Are you sure you want to delete this item?', // Message of the alert
+            'Delete Item',
+            'Are you sure you want to delete this item?',
             [
                 {
-                    text: 'No', // No option
-                    onPress: () => console.log('Delete canceled'), // Optional: log or handle the "No" action
+                    text: 'No',
+                    onPress: () => console.log('Delete canceled'), 
                     style: 'cancel',
                 },
                 {
-                    text: 'Yes', // Yes option
-                    onPress: () => console.log('Item deleted'), // Action for "Yes"
+                    text: 'Yes', 
+                    onPress: () => console.log('Item deleted'), 
                 },
             ],
             { cancelable: true }
@@ -28,16 +27,13 @@ const EditItem = () => {
 
     return (
         <ScrollView className="flex-1 bg-white p-8 mt-8">
-            {/* Header with Back and Delete Icons */}
             <View className="flex-row items-center justify-between mb-4">
-                {/* Back Icon */}
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
+                    <Image source={require('../assets/Back.png')} className="w-10 h-10" />
                 </TouchableOpacity>
 
-                {/* Delete Icon */}
                 <TouchableOpacity 
-                    onPress={showDeleteConfirmation} // Call the function to show the pop-up
+                    onPress={showDeleteConfirmation}
                     className="bg-gray-200 rounded-full p-1"
                     style={{ width: 32, height: 32, justifyContent: 'center', alignItems: 'center' }}
                 >
@@ -48,7 +44,6 @@ const EditItem = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Main Content */}
             <View className="relative">
                 <Image 
                     source={require('../assets/kardus.jpg')}

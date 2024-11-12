@@ -7,16 +7,17 @@ const ChatStart = () => {
   const navigation = useNavigation();
 
   return (
-    <View className="flex-1 bg-white pt-8">
-      <View className="flex-row items-center justify-start px-4 mb-4">
+    <View className="flex-1 bg-white pt-8 mt-8">
+      <View className="flex-row items-center justify-between px-4 mb-4">
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={require('../assets/back.png')} className="w-10 h-10" />
+          <Image source={require('../assets/Back.png')} className="w-10 h-10" />
         </TouchableOpacity>
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-gray-600 font-semibold mr-10 text-lg">Chat with buyer!</Text>
+        </View>
       </View>
 
       <View className="items-center">
-        <Text className="text-lg font-semibold mb-4">Chat with buyer!</Text>
-
         <View className="w-11/12 bg-gray-100 rounded-lg items-center p-4">
           <Image 
             source={require('../assets/foto-aldo.jpeg')}
@@ -27,10 +28,9 @@ const ChatStart = () => {
             Gunakan layanan chat ini sebagai akses barter barangmu!
           </Text>
 
-          {/* Navigate to ChatScreen on button press */}
           <TouchableOpacity
             className="w-full mt-4"
-            onPress={() => navigation.navigate('ChatScreen')} // Navigate to ChatScreen
+            onPress={() => navigation.navigate('ChatScreen')}
           >
             <LinearGradient
               colors={['#697565', '#ECDFCC']}

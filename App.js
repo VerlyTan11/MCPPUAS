@@ -31,7 +31,10 @@ export default function App() {
         <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-        <Stack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
+        <Stack.Screen name="EditProfile" component={EditProfile} options={{ 
+            title: "Edit Profile",
+            headerTitleAlign: 'center'
+          }} />
         <Stack.Screen name="EditItem" component={EditItem} options={{ headerShown: false }} />
         <Stack.Screen name="PageEdit" component={PageEdit} options={{ title:"Edit Item's", headerTitleAlign: 'center' }} />
         <Stack.Screen 

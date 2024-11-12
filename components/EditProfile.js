@@ -7,17 +7,8 @@ const EditProfile = () => {
   const navigation = useNavigation();
 
   return (
-    <ScrollView className="flex-1 p-6 bg-white">
-      {/* Header Section with Back Button and Edit Profile Text */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#ddd', justifyContent: 'center', marginTop: 20 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ position: 'absolute', left: 16 }}>
-          <Image source={require('../assets/back.png')} style={{ width: 24, height: 24 }} />
-        </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Edit Profile</Text>
-      </View>
-
-      {/* Profile Image Section with Margin Top */}
-      <View className="flex-row items-center mb-4" style={{ marginTop: 10 }}>
+    <ScrollView className="flex-1 p-8 bg-white">
+      <View className="flex-row items-center mb-4">
         <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
           <TouchableOpacity>
             <Image 
@@ -33,7 +24,6 @@ const EditProfile = () => {
         />
       </View>
 
-      {/* Input Fields */}
       <TextInput
         placeholder="Jenis Produk"
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
@@ -43,7 +33,6 @@ const EditProfile = () => {
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
       />
 
-      {/* Save Button */}
       <LinearGradient 
         colors={['#697565', '#ECDFCC']}
         start={{ x: 0, y: 0 }}

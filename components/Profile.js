@@ -6,14 +6,14 @@ import FloatingAddButton from './FloatingAddButton';
 
 const Profile = () => {
   const navigation = useNavigation();
-  const [modalVisible, setModalVisible] = useState(false); // State untuk mengontrol modal
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleBackPress = () => {
     navigation.goBack();
   };
 
   const handleMenuPress = () => {
-    setModalVisible(true); // Menampilkan modal saat tombol menu ditekan
+    setModalVisible(true); 
   };
 
   const handleEditProfilePress = () => {
@@ -21,14 +21,13 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    // Navigate to Login page upon logout
     navigation.navigate('Login'); 
-    setModalVisible(false); // Menutup modal setelah logout
+    setModalVisible(false);
   };
 
   const handleDeleteAccount = () => {
     alert('Delete Account pressed');
-    setModalVisible(false); // Menutup modal setelah menghapus akun
+    setModalVisible(false);
   };
 
   return (
@@ -42,7 +41,7 @@ const Profile = () => {
         
         <View className="absolute top-8 left-4 right-4 flex-row justify-between mx-4 my-4">
           <TouchableOpacity onPress={handleBackPress}>
-            <Image source={require('../assets/back.png')} className="w-10 h-10" />
+            <Image source={require('../assets/Back.png')} className="w-10 h-10" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleMenuPress}>
             <Image source={require('../assets/menu.png')} className="w-6 h-6" />
@@ -80,12 +79,11 @@ const Profile = () => {
 
       <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
 
-      {/* Modal untuk menu dengan pilihan Logout dan Delete Account */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} // Menutup modal ketika menekan tombol back
+        onRequestClose={() => setModalVisible(false)}
       >
         <View className="flex-1 justify-center items-center bg-black opacity-80">
           <View className="w-80 bg-white p-4 rounded-lg">
