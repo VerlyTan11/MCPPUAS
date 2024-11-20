@@ -41,7 +41,7 @@ const Profile = () => {
         
         <View className="absolute top-8 left-4 right-4 flex-row justify-between mx-4 my-4">
           <TouchableOpacity onPress={handleBackPress}>
-            <Image source={require('../assets/Back.png')} className="w-10 h-10" />
+            <Image source={require('../assets/back.png')} className="w-10 h-10" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleMenuPress}>
             <Image source={require('../assets/menu.png')} className="w-6 h-6" />

@@ -29,7 +29,7 @@ const EditItem = () => {
         <ScrollView className="flex-1 bg-white p-8 mt-8">
             <View className="flex-row items-center justify-between mb-4">
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={require('../assets/Back.png')} className="w-10 h-10" />
+                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
                 </TouchableOpacity>
 
                 <TouchableOpacity 

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Register = () => {
     const navigation = useNavigation();
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
     return (
         <View className="flex-1 items-center p-8 bg-white">
@@ -32,16 +34,30 @@ const Register = () => {
                 />
 
                 <Text className="text-gray-400">Password</Text>
-                <TextInput
-                    className="h-20 p-3 border-b border-gray-300 rounded mb-4"
-                    secureTextEntry
-                />
+                <View className="flex-row items-center border-b border-gray-300 mb-4">
+                    <TextInput
+                        className="flex-1 h-20 p-3"
+                        secureTextEntry={!isPasswordVisible}
+                    />
+                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                        <Text className="text-gray-500">
+                            {isPasswordVisible ? 'Hide' : 'Show'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
                 
                 <Text className="text-gray-400">Confirm Password</Text>
-                <TextInput
-                    className="h-20 p-3 mb-24 border-b border-gray-300 rounded"
-                    secureTextEntry
-                />
+                <View className="flex-row items-center border-b border-gray-300 mb-24">
+                    <TextInput
+                        className="flex-1 h-20 p-3"
+                        secureTextEntry={!isConfirmPasswordVisible}
+                    />
+                    <TouchableOpacity onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}>
+                        <Text className="text-gray-500">
+                            {isConfirmPasswordVisible ? 'Hide' : 'Show'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
             
             <TouchableOpacity onPress={() => navigation.navigate('Login')} className="w-full bg-gray-100 p-3 mb-4 rounded-full">
@@ -54,6 +70,6 @@ const Register = () => {
             </TouchableOpacity>
         </View>
     );
-}
+};
 
 export default Register;

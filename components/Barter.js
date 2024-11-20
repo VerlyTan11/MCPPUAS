@@ -41,7 +41,7 @@ const Barter = () => {
                     className="flex-1 items-center justify-center"
                     onPress={() => navigation.navigate('Barter')}
                 >
-                    <Text className="text-center text-white font-semibold">Konfirmasi Barter</Text>
+                    <Text className="text-center text-white font-semibold" onPress={() => navigation.navigate('Home')}>Konfirmasi Barter</Text>
                 </TouchableOpacity>
             </LinearGradient>
 

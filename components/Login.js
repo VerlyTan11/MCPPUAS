@@ -6,12 +6,11 @@ const Login = () => {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    // Handle login button press
     const handleLogin = () => {
-        // You can add a check for the credentials here (e.g., checking the email and password)
         if (email && password) {
-            navigation.navigate('Home'); // Navigate to Home page if login is successful
+            navigation.navigate('Home');
         } else {
             alert('Please enter both email and password');
         }
@@ -39,12 +38,19 @@ const Login = () => {
                 />
                 
                 <Text className="text-gray-400">Password</Text>
-                <TextInput
-                    value={password}
-                    onChangeText={setPassword}
-                    className="h-20 p-3 mb-80 border-b border-gray-300 rounded"
-                    secureTextEntry
-                />
+                <View className="flex-row items-center border-b border-gray-300 mb-80">
+                    <TextInput
+                        value={password}
+                        onChangeText={setPassword}
+                        className="flex-1 h-20 p-3"
+                        secureTextEntry={!isPasswordVisible}
+                    />
+                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                        <Text className="text-gray-500">
+                            {isPasswordVisible ? 'Hide' : 'Show'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
             
             <TouchableOpacity 
@@ -60,6 +66,6 @@ const Login = () => {
             </TouchableOpacity>
         </View>
     );
-}
+};
 
 export default Login;

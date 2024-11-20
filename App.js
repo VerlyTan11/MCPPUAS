@@ -15,6 +15,7 @@ import ChatScreen from './components/ChatScreen';
 import EditProfile from './components/EditProfile';
 import EditItem from './components/EditItem';
 import PageEdit from './components/PageEdit';
+import PilihItem from './components/PilihItem';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +48,7 @@ export default function App() {
         />
         <Stack.Screen name="ItemDetail" component={ItemDetail} options={{ headerShown: false }} />
         <Stack.Screen name="Barter" component={Barter} options={{ headerTitleAlign: 'center' }}/>
+        <Stack.Screen name="PilihItem" component={PilihItem} options={{ headerTitleAlign: 'center' }}/>
         <Stack.Screen name="ChatStart" component={ChatStart} options={{headerShown: false}}/>
         <Stack.Screen name="ChatScreen" component={ChatScreen} options={{headerShown: false}}/>
       </Stack.Navigator>

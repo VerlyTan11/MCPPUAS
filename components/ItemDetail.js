@@ -10,7 +10,7 @@ const ItemDetail = () => {
         <ScrollView className="flex-1 bg-white p-8 mt-8">
             <View className="flex-row items-center mb-4">
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={require('../assets/Back.png')} className="w-10 h-10" />
+                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
                 </TouchableOpacity>
             </View>
 
@@ -61,7 +61,7 @@ const ItemDetail = () => {
             >
                 <TouchableOpacity 
                     className="flex-1 items-center justify-center"
-                    onPress={() => navigation.navigate('Barter')}
+                    onPress={() => navigation.navigate('PilihItem')}
                 >
                     <Text className="text-center text-white font-semibold">Barter</Text>
                 </TouchableOpacity>

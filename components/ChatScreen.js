@@ -9,7 +9,7 @@ const ChatScreen = () => {
     <View className="flex-1 bg-white mt-8 py-8">
       <View className="flex-row items-center justify-between px-4 mb-4">
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image source={require('../assets/Back.png')} className="w-10 h-10" />
+          <Image source={require('../assets/back.png')} className="w-10 h-10" />
         </TouchableOpacity>
         <View className="flex-1 justify-center items-center">
           <Text className="text-gray-600 font-semibold mr-10 text-lg">Chat with deal!</Text>
