@@ -3,10 +3,22 @@ import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } fro
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { db, auth } from '../firebaseConfig';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const AddItem = () => {
     const navigation = useNavigation();
     const [selectedImage, setSelectedImage] = useState(null);
+    const [formData, setFormData] = useState({
+        alamat: '',
+        berat: '',
+        catatan: '',
+        jenis: '',
+        jumlah: '',
+        kode_pos: '',
+        nama_product: '',
+        no_rumah: '',
+    });
 
     const handleImagePicker = async () => {
         Alert.alert(
@@ -49,6 +61,34 @@ const AddItem = () => {
         );
     };
 
+    const handleInputChange = (field, value) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handlePost = async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            Alert.alert('Error', 'User not logged in');
+            return;
+        }
+
+        try {
+            const data = {
+                ...formData,
+                image_url: selectedImage || '',
+                timestamp: serverTimestamp(),
+                userId: user.uid,
+            };
+
+            await addDoc(collection(db, 'products'), data);
+            Alert.alert('Success', 'Product added successfully!');
+            navigation.navigate('Home');
+        } catch (error) {
+            console.error('Error adding product:', error);
+            Alert.alert('Error', 'Failed to add product');
+        }
+    };
+
     return (
         <ScrollView className="flex-1 p-6 bg-white">
             <View className="flex-row items-center mb-4">
@@ -71,49 +111,57 @@ const AddItem = () => {
                 </View>
                 <TextInput 
                     placeholder="Masukkan Nama Produk" 
+                    value={formData.nama_product}
+                    onChangeText={(value) => handleInputChange('nama_product', value)}
                     className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-2"
                 />
             </View>
 
             <TextInput
                 placeholder="Jenis Produk"
+                value={formData.jenis}
+                onChangeText={(value) => handleInputChange('jenis', value)}
                 className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
             />
             <View className="flex-row mb-4">
                 <TextInput 
                     placeholder="Jumlah" 
-                    className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2"
+                    value={formData.jumlah}
+                    onChangeText={(value) => handleInputChange('jumlah', value)}
+                    className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2 text-center"
                 />
                 <TextInput 
                     placeholder="Berat / pcs" 
-                    className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2"
-                />
-                <TextInput 
-                    placeholder="kg" 
-                    className="w-12 bg-gray-100 text-gray-600 rounded-lg px-4 py-3"
+                    value={formData.berat}
+                    onChangeText={(value) => handleInputChange('berat', value)}
+                    className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2 text-center"
                 />
             </View>
             <TextInput 
                 placeholder="Catatan" 
+                value={formData.catatan}
+                onChangeText={(value) => handleInputChange('catatan', value)}
                 className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
-            />
-            <TextInput
-                placeholder="Hashtag"
-                className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-6"
             />
 
             <Text className="text-gray-800 font-semibold mb-2">Lokasi</Text>
             <TextInput 
                 placeholder="Alamat Lengkap" 
+                value={formData.alamat}
+                onChangeText={(value) => handleInputChange('alamat', value)}
                 className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
             />
             <View className="flex-row mb-8">
                 <TextInput 
                     placeholder="No. Rumah" 
+                    value={formData.no_rumah}
+                    onChangeText={(value) => handleInputChange('no_rumah', value)}
                     className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2"
                 />
                 <TextInput 
                     placeholder="Kode Pos" 
+                    value={formData.kode_pos}
+                    onChangeText={(value) => handleInputChange('kode_pos', value)}
                     className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3"
                 />
             </View>
@@ -124,8 +172,8 @@ const AddItem = () => {
                 end={{ x: 1.2, y: 0 }}
                 className="flex-row items-center justify-between rounded-lg mb-6"
             >
-                <TouchableOpacity className="w-full py-4 items-center">
-                    <Text className="text-white font-semibold" onPress={() => navigation.navigate('Home')}>Posting</Text>
+                <TouchableOpacity className="w-full py-4 items-center" onPress={handlePost}>
+                    <Text className="text-white font-semibold">Posting</Text>
                 </TouchableOpacity>
             </LinearGradient>
         </ScrollView>
