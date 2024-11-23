@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import ItemsPropEditItem from './ItemsPropEditItem';
 import FloatingAddButton from './FloatingAddButton';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -14,32 +14,26 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);  
 
   useEffect(() => {
-    fetchUserData();  
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const user = auth.currentUser;  
-      if (!user) {
-        alert('User not logged in');
-        return; 
-      }
-
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        setUserData(userDoc.data());
-      } else {
-        alert('User not found in Firestore');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Error fetching user data');
-    } finally {
-      setLoading(false); 
+    const user = auth.currentUser;  
+    if (!user) {
+      alert('User not logged in');
+      return;
     }
-  };
+
+    // Realtime listener untuk data pengguna
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setUserData(snapshot.data());
+      } else {
+        alert('User data not found in Firestore');
+      }
+      setLoading(false); // Set loading selesai setelah data diambil
+    });
+
+    // Cleanup listener saat komponen di-unmount
+    return () => unsubscribe();
+  }, []);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -63,7 +57,7 @@ const Profile = () => {
     setModalVisible(false);
   };
 
-  // Render loading state or user data
+  // Render loading state atau user data
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -94,12 +88,11 @@ const Profile = () => {
       <View className="items-center mt-[-40px] p-8 bg-white rounded-t-3xl">
         {userData && (
           <>
-            {/* Gunakan foto default jika photo_url tidak ada */}
             <Image 
               source={
                 userData.photo_url 
                   ? { uri: userData.photo_url } 
-                  : require('../assets/user.png') // Foto default
+                  : require('../assets/user.png')
               }
               className="w-24 h-24 rounded-full mb-4 border-4 border-white p-2 mt-[-62px]"
             />

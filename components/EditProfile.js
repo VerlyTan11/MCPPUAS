@@ -1,12 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { db, auth } from '../firebaseConfig';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const EditProfile = () => {
   const navigation = useNavigation();
   const [profileImage, setProfileImage] = useState(null);
+  const [name, setName] = useState('');
+  const [telp, setTelp] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert('Error', 'User not logged in');
+        return;
+      }
+
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setName(data.name || '');
+        setTelp(data.telp || '');
+        setEmail(data.email || '');
+        setProfileImage(data.photo_url || null);
+      } else {
+        Alert.alert('Error', 'User data not found in Firestore');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Failed to fetch user data');
+    }
+  };
 
   const handleImagePicker = async () => {
     Alert.alert(
@@ -49,6 +84,31 @@ const EditProfile = () => {
     );
   };
 
+  const handleSaveProfile = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert('Error', 'User not logged in');
+        return;
+      }
+
+      const userDocRef = doc(db, 'users', user.uid);
+
+      await updateDoc(userDocRef, {
+        name: name,
+        telp: telp,
+        email: email,
+        photo_url: profileImage || '', // Simpan URL gambar atau kosong jika tidak ada
+      });
+
+      Alert.alert('Berhasil', 'Profil berhasil diperbarui');
+      navigation.navigate('Profile'); // Kembali ke halaman Profil
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Gagal memperbarui profil');
+    }
+  };
+
   return (
     <ScrollView className="flex-1 p-8 bg-white">
       <View className="flex-row items-center mb-4">
@@ -71,16 +131,22 @@ const EditProfile = () => {
         </View>
         <TextInput 
           placeholder="Masukkan Nama Anda" 
+          value={name}
+          onChangeText={setName}
           className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-2"
         />
       </View>
 
       <TextInput
         placeholder="No. Telp"
+        value={telp}
+        onChangeText={setTelp}
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
       />
       <TextInput 
         placeholder="Email" 
+        value={email}
+        onChangeText={setEmail}
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
       />
 
@@ -90,8 +156,8 @@ const EditProfile = () => {
         end={{ x: 1.2, y: 0 }}
         className="flex-row items-center justify-between rounded-lg mb-6"
       >
-        <TouchableOpacity className="w-full py-4 items-center">
-          <Text className="text-white font-semibold" onPress={() => navigation.navigate('Profile')}>Simpan</Text>
+        <TouchableOpacity className="w-full py-4 items-center" onPress={handleSaveProfile}>
+          <Text className="text-white font-semibold">Simpan</Text>
         </TouchableOpacity>
       </LinearGradient>
     </ScrollView>
