@@ -3,8 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, ScrollView } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
-import CryptoJS from 'crypto-js'; // Import crypto-js
+import { doc, setDoc } from 'firebase/firestore'; // Gunakan setDoc untuk menyimpan dengan ID tertentu
 
 const Register = () => {
     const navigation = useNavigation();
@@ -27,17 +26,16 @@ const Register = () => {
         }
 
         try {
+            // Buat akun pengguna di Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const { uid } = userCredential.user; // Ambil UID pengguna yang baru dibuat
 
-            // Hash password with crypto-js
-            const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64); // SHA256 hash
-
-            await addDoc(collection(db, 'users'), {
-                uid: userCredential.user.uid,
-                name,
-                email,
-                password: hashedPassword,
+            // Simpan data pengguna ke Firestore dengan id yang sama dengan UID
+            await setDoc(doc(db, 'users', uid), {
+                name,  // Simpan nama pengguna
+                email, // Simpan email pengguna
             });
+
             alert('Account created successfully!');
             navigation.navigate('Home');
         } catch (error) {
@@ -56,7 +54,7 @@ const Register = () => {
 
                 <Text className="text-xl font-bold text-black mb-8">Sign Up With Email</Text>
                 <Text className="text-center text-gray-400 text-grey mb-8">
-                    Get barter for your item's with everyone by signing up for our barter app!
+                    Get barter for your items with everyone by signing up for our barter app!
                 </Text>
 
                 <View className="w-full">
