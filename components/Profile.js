@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { db, auth } from '../firebaseConfig'; // Assuming firebaseConfig is correctly set up
+import { db, auth } from '../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import ItemsPropEditItem from './ItemsPropEditItem';
 import FloatingAddButton from './FloatingAddButton';
@@ -10,26 +10,26 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 const Profile = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [userData, setUserData] = useState(null);  // To store user data from Firestore
-  const [loading, setLoading] = useState(true);  // To handle loading state
+  const [userData, setUserData] = useState(null);  
+  const [loading, setLoading] = useState(true);  
 
   useEffect(() => {
-    fetchUserData();  // Fetch user data when the component mounts
+    fetchUserData();  
   }, []);
 
   const fetchUserData = async () => {
     try {
-      const user = auth.currentUser;  // Get current user
+      const user = auth.currentUser;  
       if (!user) {
         alert('User not logged in');
-        return;  // Stop if no user is logged in
+        return; 
       }
 
-      const userDocRef = doc(db, 'users', user.uid);  // Reference to the user's document in Firestore
+      const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
-        setUserData(userDoc.data());  // Store the user data if the document exists
+        setUserData(userDoc.data());
       } else {
         alert('User not found in Firestore');
       }
@@ -37,7 +37,7 @@ const Profile = () => {
       console.error(error);
       alert('Error fetching user data');
     } finally {
-      setLoading(false);  // Set loading to false once the data is fetched
+      setLoading(false); 
     }
   };
 
@@ -94,8 +94,13 @@ const Profile = () => {
       <View className="items-center mt-[-40px] p-8 bg-white rounded-t-3xl">
         {userData && (
           <>
+            {/* Gunakan foto default jika photo_url tidak ada */}
             <Image 
-              source={{ uri: userData.photo_url || '../assets/default-profile.png' }} // Use default if no image
+              source={
+                userData.photo_url 
+                  ? { uri: userData.photo_url } 
+                  : require('../assets/user.png') // Foto default
+              }
               className="w-24 h-24 rounded-full mb-4 border-4 border-white p-2 mt-[-62px]"
             />
             <View className="flex-row mb-8">
@@ -107,11 +112,11 @@ const Profile = () => {
                 />
               </TouchableOpacity>
             </View>
-            <View className="flex-row justify-between w-full mb-4">
+            <View className="flex-row justify-between w-11/12 mb-4">
               <Text className="text-gray-500">No. Telp</Text>
               <Text className="text-black">{userData.telp || 'No Phone Number'}</Text>
             </View>
-            <View className="flex-row justify-between w-full">
+            <View className="flex-row justify-between w-11/12">
               <Text className="text-gray-500">Email</Text>
               <Text className="text-black">{userData.email || 'No Email'}</Text>
             </View>
