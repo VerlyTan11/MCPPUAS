@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Login = () => {
     const navigation = useNavigation();
@@ -26,10 +27,10 @@ const Login = () => {
     };
 
     return (
-        <View className="flex-1 items-center p-8 bg-white">
+        <SafeAreaView className="flex-1 items-center px-8 bg-white">
             <Image
                 source={require('../assets/logo-bartems.png')}
-                className="w-36 h-36 mt-8 mb-4"
+                className="w-36 h-36 mb-4"
                 resizeMode="contain"
             />
 
@@ -49,7 +50,7 @@ const Login = () => {
                 />
 
                 <Text className="text-gray-400">Password</Text>
-                <View className="flex-row items-center border-b border-gray-300 mb-80">
+                <View className="flex-row items-center border-b border-gray-300">
                     <TextInput
                         value={password}
                         onChangeText={setPassword}
@@ -66,7 +67,7 @@ const Login = () => {
 
             <TouchableOpacity
                 onPress={handleLogin}
-                className="w-full bg-gray-100 p-3 mb-4 rounded-full"
+                className="w-full bg-gray-100 p-3 mb-4 rounded-full mt-10"
             >
                 <Text className="text-gray-500 text-center">Log in</Text>
             </TouchableOpacity>
@@ -75,7 +76,7 @@ const Login = () => {
                 <Text className="text-gray-600">Don't have an account? </Text>
                 <Text className="text-black font-bold">Sign Up</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 };
 

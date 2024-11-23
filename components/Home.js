@@ -2,10 +2,11 @@ import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ItemsProp from './ItemsProp';
 import FloatingAddButton from './FloatingAddButton';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Home = ({ navigation }) => {
     return (
-        <View className="flex-1 p-8 bg-white mt-8">
+        <SafeAreaView className="flex-1 px-8 bg-white">
             <View className="flex-row items-center justify-between mb-4">
                 <View className="flex-row items-center bg-gray-100 rounded-lg flex-1 px-4 py-2">
                     <Image 
@@ -76,7 +77,7 @@ const Home = ({ navigation }) => {
             </View>
 
             <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
-        </View>
+        </SafeAreaView>
     );
 }
 

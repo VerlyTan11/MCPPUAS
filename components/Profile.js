@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, Modal, Pressable } from 'react-nat
 import { useNavigation } from '@react-navigation/native';
 import ItemsPropEditItem from './ItemsPropEditItem';
 import FloatingAddButton from './FloatingAddButton';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -29,9 +30,10 @@ const Profile = () => {
     alert('Delete Account pressed');
     setModalVisible(false);
   };
+  
 
   return (
-    <View className="flex-1 bg-white mt-8">
+    <SafeAreaProvider className="flex-1 bg-white">
       <View className="relative">
         <Image 
           source={require('../assets/yellow-card.png')} 
@@ -39,7 +41,7 @@ const Profile = () => {
           resizeMode="cover"
         />
         
-        <View className="absolute top-8 left-4 right-4 flex-row justify-between mx-4 my-4">
+        <View className="absolute top-8 left-4 right-4 flex-row justify-between mx-4">
           <TouchableOpacity onPress={handleBackPress}>
             <Image source={require('../assets/back.png')} className="w-10 h-10" />
           </TouchableOpacity>
@@ -100,7 +102,7 @@ const Profile = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaProvider>
   );
 };
 

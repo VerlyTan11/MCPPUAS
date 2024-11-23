@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
-import bcrypt from 'bcryptjs';
+import CryptoJS from 'crypto-js'; // Import crypto-js
 
 const Register = () => {
     const navigation = useNavigation();
@@ -28,7 +28,10 @@ const Register = () => {
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
+
+            // Hash password with crypto-js
+            const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Base64); // SHA256 hash
+
             await addDoc(collection(db, 'users'), {
                 uid: userCredential.user.uid,
                 name,
@@ -36,86 +39,88 @@ const Register = () => {
                 password: hashedPassword,
             });
             alert('Account created successfully!');
-            navigation.navigate('Login');
+            navigation.navigate('Home');
         } catch (error) {
             alert(error.message);
         }
     };
 
     return (
-        <View className="flex-1 items-center p-8 bg-white">
-            <Image
-                source={require('../assets/logo-bartems.png')}
-                className="w-28 h-28 mt-8 mb-4"
-                resizeMode="contain"
-            />
-
-            <Text className="text-xl font-bold text-black mb-8">Sign Up With Email</Text>
-            <Text className="text-center text-gray-400 text-grey mb-8">
-                Get barter for your item's with everyone by signing up for our barter app!
-            </Text>
-
-            <View className="w-full">
-                <Text className="text-gray-400">Name</Text>
-                <TextInput
-                    value={name}
-                    onChangeText={setName}
-                    className="h-20 p-3 border-b border-gray-300 rounded mb-4"
-                    autoCapitalize="none"
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+            <View className="flex-1 items-center p-8 bg-white">
+                <Image
+                    source={require('../assets/logo-bartems.png')}
+                    className="w-28 h-28 mt-8 mb-4"
+                    resizeMode="contain"
                 />
 
-                <Text className="text-gray-400">Email</Text>
-                <TextInput
-                    value={email}
-                    onChangeText={setEmail}
-                    className="h-20 p-3 border-b border-gray-300 rounded mb-4"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
+                <Text className="text-xl font-bold text-black mb-8">Sign Up With Email</Text>
+                <Text className="text-center text-gray-400 text-grey mb-8">
+                    Get barter for your item's with everyone by signing up for our barter app!
+                </Text>
 
-                <Text className="text-gray-400">Password</Text>
-                <View className="flex-row items-center border-b border-gray-300 mb-4">
+                <View className="w-full">
+                    <Text className="text-gray-400">Name</Text>
                     <TextInput
-                        value={password}
-                        onChangeText={setPassword}
-                        className="flex-1 h-20 p-3"
-                        secureTextEntry={!isPasswordVisible}
+                        value={name}
+                        onChangeText={setName}
+                        className="h-20 p-3 border-b border-gray-300 rounded mb-4"
+                        autoCapitalize="none"
                     />
-                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-                        <Text className="text-gray-500">
-                            {isPasswordVisible ? 'Hide' : 'Show'}
-                        </Text>
-                    </TouchableOpacity>
+
+                    <Text className="text-gray-400">Email</Text>
+                    <TextInput
+                        value={email}
+                        onChangeText={setEmail}
+                        className="h-20 p-3 border-b border-gray-300 rounded mb-4"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+
+                    <Text className="text-gray-400">Password</Text>
+                    <View className="flex-row items-center border-b border-gray-300 mb-4">
+                        <TextInput
+                            value={password}
+                            onChangeText={setPassword}
+                            className="flex-1 h-20 p-3"
+                            secureTextEntry={!isPasswordVisible}
+                        />
+                        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                            <Text className="text-gray-500">
+                                {isPasswordVisible ? 'Hide' : 'Show'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text className="text-gray-400">Confirm Password</Text>
+                    <View className="flex-row items-center border-b border-gray-300 mb-4">
+                        <TextInput
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            className="flex-1 h-20 p-3"
+                            secureTextEntry={!isConfirmPasswordVisible}
+                        />
+                        <TouchableOpacity onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}>
+                            <Text className="text-gray-500">
+                                {isConfirmPasswordVisible ? 'Hide' : 'Show'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
 
-                <Text className="text-gray-400">Confirm Password</Text>
-                <View className="flex-row items-center border-b border-gray-300 mb-4">
-                    <TextInput
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        className="flex-1 h-20 p-3"
-                        secureTextEntry={!isConfirmPasswordVisible}
-                    />
-                    <TouchableOpacity onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}>
-                        <Text className="text-gray-500">
-                            {isConfirmPasswordVisible ? 'Hide' : 'Show'}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                    onPress={handleRegister}
+                    className="w-full bg-gray-100 p-3 mb-4 rounded-full"
+                >
+                    <Text className="text-gray-500 text-center">Create an account</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.navigate('Login')} className="flex-row">
+                    <Text className="text-gray-600">Have an account?</Text>
+                    <Text className="text-black font-bold"> Login</Text>
+                </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-                onPress={handleRegister}
-                className="w-full bg-gray-100 p-3 mb-4 rounded-full"
-            >
-                <Text className="text-gray-500 text-center">Create an account</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.navigate('Login')} className="flex-row">
-                <Text className="text-gray-600">Have an account?</Text>
-                <Text className="text-black font-bold"> Login</Text>
-            </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 };
 
