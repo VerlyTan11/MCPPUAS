@@ -2,38 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 const ItemsProEditItem = () => {
     const navigation = useNavigation();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchUserProducts = async () => {
+    // Fetch user products with real-time listener
+    const fetchUserProducts = () => {
         try {
             const userId = auth.currentUser.uid;
             const productsRef = collection(db, 'products');
             const q = query(productsRef, where('userId', '==', userId));
-            const querySnapshot = await getDocs(q);
-            
-            const productsList = [];
-            querySnapshot.forEach((doc) => {
-                productsList.push({
-                    id: doc.id,
-                    ...doc.data(),
+
+            // Real-time listener to auto-update the products list
+            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const productsList = [];
+                querySnapshot.forEach((doc) => {
+                    productsList.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    });
                 });
+
+                setProducts(productsList);
+                setLoading(false);  // Set loading to false once data is fetched
             });
 
-            setProducts(productsList);
+            // Return the unsubscribe function to stop listening to updates when the component unmounts
+            return unsubscribe;
         } catch (error) {
             console.error('Error fetching products:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchUserProducts();
+        const unsubscribe = fetchUserProducts();
+
+        // Cleanup the listener when the component unmounts
+        return () => unsubscribe();
     }, []);
 
     if (loading) {
