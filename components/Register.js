@@ -19,29 +19,31 @@ const Register = () => {
             alert('Please fill all fields');
             return;
         }
-
+    
         if (password !== confirmPassword) {
             alert('Passwords do not match');
             return;
         }
-
+    
         try {
             // Buat akun pengguna di Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const { uid } = userCredential.user; // Ambil UID pengguna yang baru dibuat
-
+    
             // Simpan data pengguna ke Firestore dengan id yang sama dengan UID
             await setDoc(doc(db, 'users', uid), {
                 name,  // Simpan nama pengguna
                 email, // Simpan email pengguna
             });
-
+    
+            // Tampilkan pop-up dan arahkan ke halaman login
             alert('Account created successfully!');
-            navigation.navigate('Home');
+            navigation.navigate('Login');
         } catch (error) {
             alert(error.message);
         }
     };
+    
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">

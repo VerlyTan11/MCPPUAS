@@ -20,16 +20,44 @@ const Login = () => {
             alert('Please enter both email and password');
             return;
         }
-
+    
         try {
+            // Login menggunakan email dan password
             await signInWithEmailAndPassword(auth, email, password);
             await AsyncStorage.setItem('userEmail', email); // Simpan email ke AsyncStorage
-            alert('Login successful!');
-            navigation.navigate('Home');
+    
+            // Jika login berhasil, lanjutkan ke verifikasi biometrik
+            const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
+            if (!isBiometricAvailable) {
+                alert('Biometric authentication is not supported on this device.');
+                navigation.navigate('Home'); // Langsung ke Home jika biometrik tidak tersedia
+                return;
+            }
+    
+            const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
+            if (!savedBiometrics) {
+                alert('No biometric record found. Proceeding without biometric verification.');
+                navigation.navigate('Home'); // Langsung ke Home jika biometrik tidak terdaftar
+                return;
+            }
+    
+            const biometricAuth = await LocalAuthentication.authenticateAsync({
+                promptMessage: 'Verify your identity',
+                cancelLabel: 'Cancel',
+                disableDeviceFallback: true,
+            });
+    
+            if (biometricAuth.success) {
+                alert('Biometric verification successful!');
+                navigation.navigate('Home');
+            } else {
+                alert('Biometric verification failed. Please try again.');
+            }
         } catch (error) {
             alert(error.message);
         }
     };
+    
 
     const fallBackToDefaultAuth = () => {
         console.log('Fallback to password authentication');
@@ -147,20 +175,13 @@ const Login = () => {
 
             <Text>
                 {isBiometricSupported
-                    ? 'Your device is compatible with biometric'
+                    ? 'Your device is compatible with biometric!'
                     : 'Fingerprint scanner is unavailable on this device'}
             </Text>
 
-            <TouchableOpacity onPress={handleBiometricAuth}>
-                <Image
-                    source={require('../assets/fingerprint.png')}
-                    className="w-16 h-16"
-                />
-            </TouchableOpacity>
-
             <TouchableOpacity onPress={() => navigation.navigate('Register')} className="flex-row">
-                <Text className="text-gray-600">Don't have an account? </Text>
-                <Text className="text-black font-bold">Sign Up</Text>
+                <Text className="text-gray-600 mt-2">Don't have an account? </Text>
+                <Text className="text-black font-bold mt-2">Sign Up</Text>
             </TouchableOpacity>
         </SafeAreaView>
     );

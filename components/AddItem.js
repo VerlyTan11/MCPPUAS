@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -13,7 +14,7 @@ const AddItem = () => {
         alamat: '',
         berat: '',
         catatan: '',
-        jenis: '',
+        jenis: '', // Default jenis kosong untuk placeholder
         jumlah: '',
         kode_pos: '',
         nama_product: '',
@@ -72,6 +73,11 @@ const AddItem = () => {
             return;
         }
 
+        if (!formData.jenis) {
+            Alert.alert('Error', 'Harap pilih jenis produk terlebih dahulu!');
+            return;
+        }
+
         try {
             const data = {
                 ...formData,
@@ -117,12 +123,24 @@ const AddItem = () => {
                 />
             </View>
 
-            <TextInput
-                placeholder="Jenis Produk"
-                value={formData.jenis}
-                onChangeText={(value) => handleInputChange('jenis', value)}
-                className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
-            />
+            <View className="bg-gray-100 rounded-lg mb-4">
+                <Picker
+                    selectedValue={formData.jenis}
+                    onValueChange={(value) => handleInputChange('jenis', value)}
+                >
+                    <Picker.Item 
+                        label="Pilih Jenis Produk" 
+                        value="" 
+                        color="#888" // Warna lebih terang untuk placeholder
+                    />
+                    <Picker.Item label="Kardus" value="kardus" />
+                    <Picker.Item label="Kain" value="kain" />
+                    <Picker.Item label="Kamera" value="kamera" />
+                    <Picker.Item label="Buku" value="buku" />
+                    <Picker.Item label="More" value="more" />
+                </Picker>
+            </View>
+
             <View className="flex-row mb-4">
                 <TextInput 
                     placeholder="Jumlah" 
@@ -131,10 +149,10 @@ const AddItem = () => {
                     className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2 text-center"
                 />
                 <TextInput 
-                    placeholder="Berat / pcs" 
+                    placeholder="Berat / pcs | kg" 
                     value={formData.berat}
                     onChangeText={(value) => handleInputChange('berat', value)}
-                    className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2 text-center"
+                    className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 text-center"
                 />
             </View>
             <TextInput 

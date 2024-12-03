@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, Pressable } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
-import { doc, onSnapshot } from 'firebase/firestore';
-import ItemsPropEditItem from './ItemsPropEditItem';
-import FloatingAddButton from './FloatingAddButton';
+import { doc, deleteDoc, onSnapshot } from 'firebase/firestore'; // Add onSnapshot import
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Profile = () => {
@@ -52,9 +50,35 @@ const Profile = () => {
     setModalVisible(false);
   };
 
-  const handleDeleteAccount = () => {
-    alert('Delete Account pressed');
-    setModalVisible(false);
+  const handleDeleteAccount = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('User not authenticated');
+      return;
+    }
+
+    try {
+      // Hapus data pengguna dari Firestore
+      await deleteDoc(doc(db, 'users', user.uid));
+      console.log('User data deleted from Firestore');
+
+      // Hapus akun pengguna dari Firebase Authentication
+      await user.delete();
+      console.log('User account deleted from Firebase Authentication');
+
+      // Navigate ke halaman login setelah akun dihapus
+      navigation.navigate('Login');
+      setModalVisible(false);
+      alert('Account successfully deleted');
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      if (error.code === 'auth/requires-recent-login') {
+        alert('You need to log in again to delete your account.');
+      } else {
+        alert('An error occurred while deleting the account.');
+      }
+    }
   };
 
   // Render loading state atau user data
@@ -89,20 +113,13 @@ const Profile = () => {
         {userData && (
           <>
             <Image 
-              source={
-                userData.photo_url 
-                  ? { uri: userData.photo_url } 
-                  : require('../assets/user.png')
-              }
+              source={userData.photo_url ? { uri: userData.photo_url } : require('../assets/user.png')}
               className="w-24 h-24 rounded-full mb-4 border-4 border-white p-2 mt-[-62px]"
             />
             <View className="flex-row mb-8">
               <Text className="text-xl font-bold">{userData.name || 'User Name'}</Text>
               <TouchableOpacity onPress={handleEditProfilePress}>
-                <Image 
-                  source={require('../assets/edit.png')}
-                  className="w-5 h-5 ml-2"
-                />
+                <Image source={require('../assets/edit.png')} className="w-5 h-5 ml-2" />
               </TouchableOpacity>
             </View>
             <View className="flex-row justify-between w-11/12 mb-4">
@@ -116,12 +133,6 @@ const Profile = () => {
           </>
         )}
       </View>
-
-      <View className="mx-4">
-        <ItemsPropEditItem />
-      </View>
-
-      <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
 
       <Modal
         animationType="slide"

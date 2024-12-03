@@ -4,7 +4,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { db } from '../firebaseConfig'; // Make sure firebaseConfig is set up correctly
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+
 
 const EditItem = () => {
     const navigation = useNavigation();
@@ -75,6 +76,20 @@ const EditItem = () => {
         }
     };
 
+    // Function to delete product data from Firestore
+    const handleDeleteProduct = async () => {
+        try {
+            const docRef = doc(db, 'products', itemId);
+            await deleteDoc(docRef); // Delete the document
+            Alert.alert('Success', 'Product deleted successfully');
+            navigation.goBack(); // Navigate back after successful deletion
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            Alert.alert('Error', 'Failed to delete product');
+        }
+    };
+
+
     if (loading) {
         return (
             <View className="flex-1 justify-center items-center">
@@ -102,7 +117,7 @@ const EditItem = () => {
                             },
                             {
                                 text: 'Yes',
-                                onPress: () => console.log('Item deleted'),
+                                onPress: handleDeleteProduct,
                             },
                         ],
                         { cancelable: true }

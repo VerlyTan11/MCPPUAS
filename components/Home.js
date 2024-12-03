@@ -56,7 +56,7 @@ const Home = ({ navigation }) => {
                     { label: 'Kain', icon: require('../assets/hanger.png') },
                     { label: 'Kamera', icon: require('../assets/cam.png') },
                     { label: 'Buku', icon: require('../assets/book.png') },
-                    { label: 'Tas', icon: require('../assets/bag.png') }
+                    { label: 'More', icon: require('../assets/more.png') }
                 ].map((item, index) => (
                     <View key={index} className="flex-col items-center mb-4">
                         <TouchableOpacity className="bg-gray-100 py-3 px-4 rounded-md">
