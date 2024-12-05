@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'; 
 import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native'; // Tambahkan useIsFocused
+import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,10 +8,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 const ItemDetail = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const isFocused = useIsFocused(); // Hook untuk mendeteksi fokus layar
-    const { itemId } = route.params || {}; // ID produk dari navigasi
-    const [product, setProduct] = useState(null); // Data produk
-    const [owner, setOwner] = useState(null); // Data pemilik produk
+    const isFocused = useIsFocused();
+    const { itemId } = route.params || {};
+    const [product, setProduct] = useState(null);
+    const [owner, setOwner] = useState(null);
 
     // Fungsi untuk Fetch Data
     const fetchProductDetails = async () => {
@@ -21,17 +21,22 @@ const ItemDetail = () => {
                 navigation.goBack();
                 return;
             }
-
+    
             const productRef = doc(db, 'products', itemId);
             const productSnapshot = await getDoc(productRef);
+    
             if (productSnapshot.exists()) {
                 const productData = productSnapshot.data();
-                setProduct({ ...productData, id: itemId }); // Simpan id ke product
-
-                const ownerRef = doc(db, 'users', productData.userId);
+                setProduct({ ...productData, id: itemId });
+    
+                const ownerRef = doc(db, 'users', productData.userId); // Ambil userId dari data produk
                 const ownerSnapshot = await getDoc(ownerRef);
+    
                 if (ownerSnapshot.exists()) {
-                    setOwner(ownerSnapshot.data());
+                    setOwner(ownerSnapshot.data()); // Simpan data pemilik
+                } else {
+                    console.warn('Owner not found');
+                    setOwner({ name: 'Unknown User', email: 'Not available', photo_url: null }); // Data fallback
                 }
             } else {
                 Alert.alert('Error', 'Product not found!');
@@ -39,11 +44,11 @@ const ItemDetail = () => {
             }
         } catch (error) {
             console.error('Error fetching product details:', error);
-            Alert.alert('Error', 'Failed to fetch product details');
+            Alert.alert('Error', 'Failed to fetch product details. Check your internet connection or permissions.');
         }
-    };
+    };    
 
-    // Fetch data saat pertama kali halaman dimuat atau layar kembali fokus
+    // Fetch data saat halaman dimuat atau layar kembali fokus
     useEffect(() => {
         if (isFocused) {
             fetchProductDetails();
@@ -131,9 +136,9 @@ const ItemDetail = () => {
                     className="flex-1 items-center justify-center"
                     onPress={() => {
                         if (isUserOwner) {
-                            navigation.navigate('EditItem', { itemId: product.id }); // Send product.id
+                            navigation.navigate('EditItem', { itemId: product.id });
                         } else {
-                            navigation.navigate('PilihItem', { itemId: product.id }); // Send product.id
+                            navigation.navigate('PilihItem', { itemId: product.id });
                         }
                     }}
                 >

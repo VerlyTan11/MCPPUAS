@@ -1,12 +1,16 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ItemsProp from './ItemsProp';
 import FloatingAddButton from './FloatingAddButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { auth } from '../firebaseConfig';
 
 const Home = ({ navigation }) => {
-    return (
-        <SafeAreaView className="flex-1 px-8 bg-white">
+    const currentUser = auth.currentUser;
+
+    const renderHeader = () => (
+        <View>
+            {/* Search and Profile */}
             <View className="flex-row items-center justify-between mb-4">
                 <View className="flex-row items-center bg-gray-100 rounded-lg flex-1 px-4 py-2">
                     <Image 
@@ -34,6 +38,7 @@ const Home = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
+            {/* Explore Section */}
             <LinearGradient 
                 colors={['#697565', '#ECDFCC']}
                 start={{ x: 0, y: 0 }}
@@ -43,12 +48,16 @@ const Home = ({ navigation }) => {
                 <View className="flex-1">
                     <Text className="text-xl font-bold text-white">Explore Item's</Text>
                     <Text className="text-white text-sm">Tukarkan dengan apa yang Anda inginkan</Text>
-                    <TouchableOpacity className="bg-gray-600 rounded-lg mt-2 px-3 py-2 w-32">
+                    <TouchableOpacity 
+                        className="bg-gray-600 rounded-lg mt-2 px-3 py-2 w-32"
+                        onPress={() => navigation.navigate('AddItem')}
+                    >
                         <Text className="text-white text-center">Mulai Barter</Text>
                     </TouchableOpacity>
                 </View>
             </LinearGradient>
 
+            {/* Kategori */}
             <Text className="text-xl font-bold text-black mb-4">Kategori</Text>
             <View className="flex-row flex-wrap justify-around mb-6">
                 {[
@@ -71,14 +80,28 @@ const Home = ({ navigation }) => {
                 ))}
             </View>
 
+            {/* Rekomendasi Title */}
             <Text className="text-xl font-bold text-black mb-4">Rekomendasi</Text>
-            <View>
-                <ItemsProp />
-            </View>
+        </View>
+    );
 
+    return (
+        <SafeAreaView className="flex-1 bg-white">
+            <FlatList
+                data={[1]} // Gunakan placeholder karena ItemsProp akan di-render
+                renderItem={null} // ItemsProp dihandle secara terpisah
+                ListHeaderComponent={renderHeader}
+                ListFooterComponent={
+                    <View>
+                        <ItemsProp excludeUserId={currentUser?.uid} />
+                    </View>
+                }
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}
+                showsVerticalScrollIndicator={false}
+            />
             <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
         </SafeAreaView>
     );
-}
+};
 
 export default Home;
