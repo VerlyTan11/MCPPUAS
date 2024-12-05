@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, Pressable, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
-import { doc, deleteDoc, onSnapshot } from 'firebase/firestore'; // Add onSnapshot import
+import { doc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Profile = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [userData, setUserData] = useState(null);  
-  const [loading, setLoading] = useState(true);  
+  const [userData, setUserData] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const user = auth.currentUser;  
@@ -20,17 +21,38 @@ const Profile = () => {
 
     // Realtime listener untuk data pengguna
     const userDocRef = doc(db, 'users', user.uid);
-    const unsubscribe = onSnapshot(userDocRef, (snapshot) => {
+    const unsubscribeUser = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
         setUserData(snapshot.data());
       } else {
         alert('User data not found in Firestore');
       }
-      setLoading(false); // Set loading selesai setelah data diambil
     });
 
+    // Realtime listener untuk postingan pengguna
+    const fetchProducts = () => {
+      const productsRef = collection(db, 'products');
+      const q = query(productsRef, where('userId', '==', user.uid));
+
+      const unsubscribeProducts = onSnapshot(q, (snapshot) => {
+        const productsList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProducts(productsList);
+        setLoading(false);
+      });
+
+      return unsubscribeProducts;
+    };
+
+    const unsubscribeProducts = fetchProducts();
+
     // Cleanup listener saat komponen di-unmount
-    return () => unsubscribe();
+    return () => {
+      unsubscribeUser();
+      unsubscribeProducts();
+    };
   }, []);
 
   const handleBackPress = () => {
@@ -59,15 +81,8 @@ const Profile = () => {
     }
 
     try {
-      // Hapus data pengguna dari Firestore
       await deleteDoc(doc(db, 'users', user.uid));
-      console.log('User data deleted from Firestore');
-
-      // Hapus akun pengguna dari Firebase Authentication
       await user.delete();
-      console.log('User account deleted from Firebase Authentication');
-
-      // Navigate ke halaman login setelah akun dihapus
       navigation.navigate('Login');
       setModalVisible(false);
       alert('Account successfully deleted');
@@ -81,7 +96,6 @@ const Profile = () => {
     }
   };
 
-  // Render loading state atau user data
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
@@ -132,6 +146,34 @@ const Profile = () => {
             </View>
           </>
         )}
+      </View>
+
+      {/* Postingan Produk */}
+      <View className="flex-1 bg-gray-100 p-4">
+        <Text className="text-lg font-bold mb-4">Your Posts</Text>
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 10 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('ItemDetail', { itemId: item.id })}
+              style={{ width: '48%' }}
+            >
+              <Image 
+                source={item.image_url ? { uri: item.image_url } : require('../assets/kardus.jpg')}
+                style={{
+                  width: '100%',
+                  height: 150,
+                  borderRadius: 10,
+                  backgroundColor: '#ccc',
+                }}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          )}
+        />
       </View>
 
       <Modal
