@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react'; 
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native'; // Tambahkan useIsFocused
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,35 +8,47 @@ import { LinearGradient } from 'expo-linear-gradient';
 const ItemDetail = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { itemId } = route.params; // ID produk dari navigasi
+    const isFocused = useIsFocused(); // Hook untuk mendeteksi fokus layar
+    const { itemId } = route.params || {}; // ID produk dari navigasi
     const [product, setProduct] = useState(null); // Data produk
     const [owner, setOwner] = useState(null); // Data pemilik produk
 
-    useEffect(() => {
-        const fetchProductDetails = async () => {
-            try {
-                const productRef = doc(db, 'products', itemId);
-                const productSnapshot = await getDoc(productRef);
-                if (productSnapshot.exists()) {
-                    const productData = productSnapshot.data();
-                    setProduct(productData);
-
-                    const ownerRef = doc(db, 'users', productData.userId);
-                    const ownerSnapshot = await getDoc(ownerRef);
-                    if (ownerSnapshot.exists()) {
-                        setOwner(ownerSnapshot.data());
-                    }
-                } else {
-                    alert('Product not found!');
-                    navigation.goBack();
-                }
-            } catch (error) {
-                console.error('Error fetching product details:', error);
+    // Fungsi untuk Fetch Data
+    const fetchProductDetails = async () => {
+        try {
+            if (!itemId) {
+                Alert.alert('Error', 'Product ID is missing!');
+                navigation.goBack();
+                return;
             }
-        };
 
-        fetchProductDetails();
-    }, [itemId]);
+            const productRef = doc(db, 'products', itemId);
+            const productSnapshot = await getDoc(productRef);
+            if (productSnapshot.exists()) {
+                const productData = productSnapshot.data();
+                setProduct({ ...productData, id: itemId }); // Simpan id ke product
+
+                const ownerRef = doc(db, 'users', productData.userId);
+                const ownerSnapshot = await getDoc(ownerRef);
+                if (ownerSnapshot.exists()) {
+                    setOwner(ownerSnapshot.data());
+                }
+            } else {
+                Alert.alert('Error', 'Product not found!');
+                navigation.goBack();
+            }
+        } catch (error) {
+            console.error('Error fetching product details:', error);
+            Alert.alert('Error', 'Failed to fetch product details');
+        }
+    };
+
+    // Fetch data saat pertama kali halaman dimuat atau layar kembali fokus
+    useEffect(() => {
+        if (isFocused) {
+            fetchProductDetails();
+        }
+    }, [isFocused]);
 
     if (!product || !owner) {
         return (
@@ -46,7 +58,7 @@ const ItemDetail = () => {
         );
     }
 
-    const isUserOwner = auth.currentUser.uid === product.userId;
+    const isUserOwner = auth.currentUser?.uid === product.userId;
 
     return (
         <ScrollView className="flex-1 bg-gray-100 p-4">
@@ -113,15 +125,15 @@ const ItemDetail = () => {
                 colors={['#697565', '#ECDFCC']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1.2, y: 0 }}
-                className="flex-row items-center justify-center p-4 rounded-lg shadow-md"
+                className="flex-row items-center justify-center p-4 rounded-lg shadow-md mb-8"
             >
                 <TouchableOpacity 
                     className="flex-1 items-center justify-center"
                     onPress={() => {
                         if (isUserOwner) {
-                            navigation.navigate('EditItem', { itemId: product.id });
+                            navigation.navigate('EditItem', { itemId: product.id }); // Send product.id
                         } else {
-                            navigation.navigate('PilihItem', { itemId: product.id });
+                            navigation.navigate('PilihItem', { itemId: product.id }); // Send product.id
                         }
                     }}
                 >
