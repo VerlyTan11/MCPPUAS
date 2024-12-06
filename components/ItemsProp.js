@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 const ItemsProp = ({ excludeUserId }) => {
     const navigation = useNavigation();
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        const productsRef = collection(db, 'products');
+        // Query koleksi products dan urutkan berdasarkan timestamp
+        const productsRef = query(
+            collection(db, 'products'),
+            orderBy('timestamp', 'desc') // Mengurutkan dari yang terbaru ke yang terlama
+        );
 
         const unsubscribe = onSnapshot(productsRef, (querySnapshot) => {
             const productsList = [];
