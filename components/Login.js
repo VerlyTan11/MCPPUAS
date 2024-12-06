@@ -177,7 +177,17 @@ const Login = () => {
                 </View>
             </View>
 
-            <TouchableOpacity onPress={handleLogin} style={{ width: '100%', backgroundColor: '#f0f0f0', padding: 12, marginBottom: 16, borderRadius: 24 }}>
+            <TouchableOpacity 
+                onPress={handleLogin} 
+                style={{ 
+                    width: '100%', 
+                    backgroundColor: '#f0f0f0', 
+                    padding: 12, 
+                    marginBottom: 16, 
+                    borderRadius: 24, 
+                    marginTop: 20
+                }}
+            >
                 <Text style={{ color: '#808080', textAlign: 'center' }}>Log in</Text>
             </TouchableOpacity>
 
