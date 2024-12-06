@@ -4,12 +4,17 @@ import { useNavigation } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import debounce from 'lodash.debounce';
+import { useSelector } from 'react-redux'; // Import Redux hook
 
-const ItemsProp = ({ excludeUserId, filterCategory, searchQuery }) => {
+const ItemsProp = ({ excludeUserId }) => {
     const navigation = useNavigation();
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Ambil kategori dan pencarian dari Redux
+    const filterCategory = useSelector((state) => state.category.selected);
+    const searchQuery = useSelector((state) => state.search.query);
 
     // Ambil data produk dari Firestore
     useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react'; 
 import {
     View,
     Text,
@@ -15,11 +15,15 @@ import ItemsProp from './ItemsProp';
 import FloatingAddButton from './FloatingAddButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebaseConfig';
+import { useSelector, useDispatch } from 'react-redux'; // Import Redux hooks
+import { setSearchQuery } from '../redux/searchSlice'; // Import action untuk pencarian
+import { setCategory } from '../redux/categorySlice'; // Import action untuk kategori
 
 const Home = ({ navigation }) => {
     const currentUser = auth.currentUser;
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
+    const dispatch = useDispatch(); // Inisialisasi dispatch Redux
+    const searchQuery = useSelector((state) => state.search.query); // Ambil state pencarian dari Redux
+    const selectedCategory = useSelector((state) => state.category.selected); // Ambil kategori terpilih dari Redux
     const [triggeredSearchQuery, setTriggeredSearchQuery] = useState('');
     const inputRef = useRef(null);
 
@@ -41,15 +45,19 @@ const Home = ({ navigation }) => {
     };
 
     const handleSearchChange = (text) => {
-        setSearchQuery(text);
+        dispatch(setSearchQuery(text)); // Update query pencarian di Redux
         if (text.trim() === '') {
             setTriggeredSearchQuery('');
         }
     };
 
+    const handleCategorySelect = (category) => {
+        dispatch(setCategory(category === selectedCategory ? null : category)); // Update kategori di Redux
+    };
+
     const renderHeader = () => (
         <View>
-            <View className="flex-row items-center justify-between mb-4">
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <View className="flex-row items-center bg-gray-100 rounded-lg flex-1 px-4 py-2">
                     <TextInput
                         ref={inputRef}
@@ -91,7 +99,7 @@ const Home = ({ navigation }) => {
                 className="flex-row items-center justify-between p-4 rounded-lg mb-6"
             >
                 <View className="flex-1">
-                    <Text className="text-xl font-bold text-white">Explore Item's</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>Explore Item's</Text>
                     <Text className="text-white text-sm">Tukarkan dengan apa yang Anda inginkan</Text>
                     <TouchableOpacity
                         className="bg-gray-600 rounded-lg mt-2 px-3 py-2 w-32"
@@ -107,15 +115,11 @@ const Home = ({ navigation }) => {
                 {categories.map((item, index) => (
                     <View key={index} className="flex-col items-center mb-4">
                         <TouchableOpacity
-                            onPress={() =>
-                                setSelectedCategory((prevCategory) =>
-                                    prevCategory === item.value ? null : item.value
-                                )
-                            }
+                            onPress={() => handleCategorySelect(item.value)}
                             className={`py-3 px-4 rounded-md ${
                                 selectedCategory === item.value ? 'bg-green-200' : 'bg-gray-100'
                             }`}
-                        >
+                        > 
                             <Image
                                 source={item.icon}
                                 className="w-6 h-6"

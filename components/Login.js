@@ -6,6 +6,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as LocalAuthentication from 'expo-local-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Tambahkan AsyncStorage
+import { useDispatch } from 'react-redux'; // Tambahkan import Redux
+import { setUser } from '../redux/authSlice'; // Tambahkan action Redux
 
 const Login = () => {
     const [isBiometricSupported, setIsBiometricSupported] = useState(false);
@@ -13,6 +15,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const dispatch = useDispatch(); // Inisialisasi dispatch Redux
 
     // Fungsi untuk login menggunakan email dan password
     const handleLogin = async () => {
@@ -23,7 +26,12 @@ const Login = () => {
     
         try {
             // Login menggunakan email dan password
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Simpan ke Redux state
+            dispatch(setUser({ uid: user.uid, email: user.email }));
+
             await AsyncStorage.setItem('userEmail', email); // Simpan email ke AsyncStorage
     
             // Jika login berhasil, lanjutkan ke verifikasi biometrik
@@ -128,16 +136,19 @@ const Login = () => {
     }, []);
 
     return (
-        <SafeAreaView className="flex-1 items-center px-8 bg-white">
+        <SafeAreaView style={{ flex: 1, alignItems: 'center', paddingHorizontal: 32, backgroundColor: 'white' }}>
             <Image
                 source={require('../assets/logo-bartems.png')}
                 className="w-36 h-36 mb-4"
                 resizeMode="contain"
             />
 
-            <Text className="text-2xl font-bold text-black mb-8">Login to Bartem's</Text>
-            <Text className="text-center text-gray-400 mb-8">
-                Welcome back! Sign in using your account to continue
+            <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'black', marginBottom: 32 }}>
+            Login to Bartem's
+            </Text>
+
+            <Text style={{ textAlign: 'center', color: 'gray', marginBottom: 8 }}>
+            Welcome back! Sign in using your account to continue
             </Text>
 
             <View className="w-full">
@@ -166,11 +177,8 @@ const Login = () => {
                 </View>
             </View>
 
-            <TouchableOpacity
-                onPress={handleLogin}
-                className="w-full bg-gray-100 p-3 mb-4 rounded-full mt-10"
-            >
-                <Text className="text-gray-500 text-center">Log in</Text>
+            <TouchableOpacity onPress={handleLogin} style={{ width: '100%', backgroundColor: '#f0f0f0', padding: 12, marginBottom: 16, borderRadius: 24 }}>
+                <Text style={{ color: '#808080', textAlign: 'center' }}>Log in</Text>
             </TouchableOpacity>
 
             <Text>

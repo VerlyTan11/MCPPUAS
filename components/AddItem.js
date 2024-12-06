@@ -6,9 +6,12 @@ import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { db, auth } from '../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useDispatch } from 'react-redux'; // Import Redux hook
+import { addItem } from '../redux/itemsSlice'; // Import action untuk Redux
 
 const AddItem = () => {
     const navigation = useNavigation();
+    const dispatch = useDispatch(); // Inisialisasi dispatch Redux
     const [selectedImage, setSelectedImage] = useState(null);
     const [formData, setFormData] = useState({
         alamat: '',
@@ -82,11 +85,16 @@ const AddItem = () => {
             const data = {
                 ...formData,
                 image_url: selectedImage || '',
-                timestamp: serverTimestamp(),
+                timestamp: new Date().toISOString(),
                 userId: user.uid,
             };
 
-            await addDoc(collection(db, 'products'), data);
+            // Simpan data ke Firestore
+            const docRef = await addDoc(collection(db, 'products'), data);
+
+            // Simpan data ke Redux store
+            dispatch(addItem({ id: docRef.id, ...data }));
+
             Alert.alert('Success', 'Product added successfully!');
             navigation.navigate('Home');
         } catch (error) {
@@ -96,7 +104,7 @@ const AddItem = () => {
     };
 
     return (
-        <ScrollView className="flex-1 p-6 bg-white">
+        <ScrollView style={{ flex: 1, padding: 24, backgroundColor: 'white' }}>
             <View className="flex-row items-center mb-4">
                 <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
                     <TouchableOpacity onPress={handleImagePicker}>
@@ -190,7 +198,7 @@ const AddItem = () => {
                 end={{ x: 1.2, y: 0 }}
                 className="flex-row items-center justify-between rounded-lg mb-6"
             >
-                <TouchableOpacity className="w-full py-4 items-center" onPress={handlePost}>
+                <TouchableOpacity style={{ width: '100%', paddingVertical: 16, alignItems: 'center' }} onPress={handlePost}>
                     <Text className="text-white font-semibold">Posting</Text>
                 </TouchableOpacity>
             </LinearGradient>
