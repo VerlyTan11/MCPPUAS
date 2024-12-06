@@ -143,11 +143,14 @@ const EditProfile = () => {
         onChangeText={setTelp}
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
       />
+      
       <TextInput 
         placeholder="Email" 
         value={email}
         onChangeText={setEmail}
+        editable={false} // Membuat input tidak dapat diedit
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
+        style={{ color: '#A9A9A9' }} // Memberikan gaya tambahan agar terlihat disable
       />
 
       <LinearGradient 
