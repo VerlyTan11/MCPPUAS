@@ -4,10 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
 import { doc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import RequestBarter from './RequestBarter'; // Import komponen RequestBarter
 
 const Profile = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [barterModalVisible, setBarterModalVisible] = useState(false); // State untuk modal Request Barter
   const [userData, setUserData] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,9 +119,14 @@ const Profile = () => {
           <TouchableOpacity onPress={handleBackPress}>
             <Image source={require('../assets/back.png')} className="w-10 h-10" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleMenuPress}>
-            <Image source={require('../assets/menu.png')} className="w-6 h-6" />
-          </TouchableOpacity>
+          <View className="flex-row items-center">
+            <TouchableOpacity onPress={() => setBarterModalVisible(true)}>
+              <Image source={require('../assets/notification.png')} className="w-6 h-6 mr-4" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleMenuPress}>
+              <Image source={require('../assets/menu.png')} className="w-6 h-6" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -197,6 +204,9 @@ const Profile = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Request Barter Modal */}
+      <RequestBarter visible={barterModalVisible} onClose={() => setBarterModalVisible(false)} />
     </SafeAreaProvider>
   );
 };

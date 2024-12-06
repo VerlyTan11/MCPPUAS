@@ -4,9 +4,19 @@ import ItemsProp from './ItemsProp';
 import FloatingAddButton from './FloatingAddButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebaseConfig';
+import React, { useState } from 'react';
 
 const Home = ({ navigation }) => {
     const currentUser = auth.currentUser;
+    const [selectedCategory, setSelectedCategory] = useState(null); // State untuk kategori yang dipilih
+
+    const categories = [
+        { label: 'Kardus', value: 'box', icon: require('../assets/box.png') },
+        { label: 'Kain', value: 'fabric', icon: require('../assets/hanger.png') },
+        { label: 'Kamera', value: 'camera', icon: require('../assets/cam.png') },
+        { label: 'Buku', value: 'book', icon: require('../assets/book.png') },
+        { label: 'More', value: 'more', icon: require('../assets/more.png') },
+    ];
 
     const renderHeader = () => (
         <View>
@@ -60,15 +70,18 @@ const Home = ({ navigation }) => {
             {/* Kategori */}
             <Text className="text-xl font-bold text-black mb-4">Kategori</Text>
             <View className="flex-row flex-wrap justify-around mb-6">
-                {[
-                    { label: 'Kardus', icon: require('../assets/box.png') },
-                    { label: 'Kain', icon: require('../assets/hanger.png') },
-                    { label: 'Kamera', icon: require('../assets/cam.png') },
-                    { label: 'Buku', icon: require('../assets/book.png') },
-                    { label: 'More', icon: require('../assets/more.png') }
-                ].map((item, index) => (
+                {categories.map((item, index) => (
                     <View key={index} className="flex-col items-center mb-4">
-                        <TouchableOpacity className="bg-gray-100 py-3 px-4 rounded-md">
+                        <TouchableOpacity
+                            onPress={() =>
+                                setSelectedCategory((prevCategory) =>
+                                    prevCategory === item.value ? null : item.value
+                                )
+                            }
+                            className={`py-3 px-4 rounded-md ${
+                                selectedCategory === item.value ? 'bg-green-200' : 'bg-gray-100'
+                            }`}
+                        >
                             <Image 
                                 source={item.icon}
                                 className="w-6 h-6"
@@ -93,7 +106,7 @@ const Home = ({ navigation }) => {
                 ListHeaderComponent={renderHeader}
                 ListFooterComponent={
                     <View>
-                        <ItemsProp excludeUserId={currentUser?.uid} />
+                        <ItemsProp excludeUserId={currentUser?.uid} filterCategory={selectedCategory} />
                     </View>
                 }
                 contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 80 }}

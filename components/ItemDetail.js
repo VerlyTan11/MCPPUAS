@@ -21,17 +21,17 @@ const ItemDetail = () => {
                 navigation.goBack();
                 return;
             }
-    
+
             const productRef = doc(db, 'products', itemId);
             const productSnapshot = await getDoc(productRef);
-    
+
             if (productSnapshot.exists()) {
                 const productData = productSnapshot.data();
                 setProduct({ ...productData, id: itemId });
-    
+
                 const ownerRef = doc(db, 'users', productData.userId); // Ambil userId dari data produk
                 const ownerSnapshot = await getDoc(ownerRef);
-    
+
                 if (ownerSnapshot.exists()) {
                     setOwner(ownerSnapshot.data()); // Simpan data pemilik
                 } else {
@@ -46,7 +46,7 @@ const ItemDetail = () => {
             console.error('Error fetching product details:', error);
             Alert.alert('Error', 'Failed to fetch product details. Check your internet connection or permissions.');
         }
-    };    
+    };
 
     // Fetch data saat halaman dimuat atau layar kembali fokus
     useEffect(() => {
@@ -120,7 +120,7 @@ const ItemDetail = () => {
                 <Text className="text-gray-700 mb-2">Alamat: {product.alamat || 'N/A'}</Text>
                 <Text className="text-gray-700 mb-2">Berat: {product.berat || 'N/A'}</Text>
                 <Text className="text-gray-700 mb-2">Jenis: {product.jenis || 'N/A'}</Text>
-                <Text className="text-gray-700 mb-2">Jumlah: {product.jumlah || 'N/A'}</Text>
+                <Text className="text-gray-700 mb-2">Jumlah: {product.jumlah !== undefined ? product.jumlah : 'Tidak tersedia'}</Text>
                 <Text className="text-gray-700 mb-2">Kode Pos: {product.kode_pos || 'N/A'}</Text>
                 <Text className="text-gray-700">No Rumah: {product.no_rumah || 'N/A'}</Text>
             </View>
@@ -138,7 +138,13 @@ const ItemDetail = () => {
                         if (isUserOwner) {
                             navigation.navigate('EditItem', { itemId: product.id });
                         } else {
-                            navigation.navigate('PilihItem', { itemId: product.id });
+                            navigation.navigate('PilihItem', {
+                                ownerProductId: product.id,
+                                ownerId: product.userId,
+                                ownerLocation: product.alamat || 'Lokasi tidak tersedia',
+                                ownerProductName: product.nama_product,
+                                ownerProductImage: product.image_url || null,
+                            });
                         }
                     }}
                 >
