@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import debounce from 'lodash.debounce';
 
-const ItemsProp = ({ excludeUserId, filterCategory }) => {
+const ItemsProp = ({ excludeUserId, filterCategory, searchQuery }) => {
     const navigation = useNavigation();
     const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Ambil data produk dari Firestore
     useEffect(() => {
         let productsRef = collection(db, 'products');
 
         if (filterCategory) {
-            // Tambahkan filter berdasarkan kategori
             productsRef = query(
                 productsRef,
                 where('jenis', '==', filterCategory),
                 orderBy('timestamp', 'desc')
             );
         } else {
-            // Tanpa filter kategori
             productsRef = query(productsRef, orderBy('timestamp', 'desc'));
         }
 
@@ -37,7 +38,9 @@ const ItemsProp = ({ excludeUserId, filterCategory }) => {
                         });
                     }
                 });
+
                 setProducts(productsList);
+                setFilteredProducts(productsList); // Default filter
                 setLoading(false);
             },
             (error) => {
@@ -49,6 +52,29 @@ const ItemsProp = ({ excludeUserId, filterCategory }) => {
         return () => unsubscribe();
     }, [excludeUserId, filterCategory]);
 
+    // Debounce fungsi filter
+    const debouncedFilter = useMemo(
+        () =>
+            debounce((query) => {
+                if (query.trim()) {
+                    setFilteredProducts(
+                        products.filter((product) =>
+                            product.nama_product.toLowerCase().includes(query.toLowerCase())
+                        )
+                    );
+                } else {
+                    setFilteredProducts(products);
+                }
+            }, 100), // Kurangi debounce delay untuk lebih responsif
+        [products]
+    );
+
+    // Perbarui filter ketika searchQuery berubah
+    useEffect(() => {
+        debouncedFilter(searchQuery);
+        return () => debouncedFilter.cancel(); // Cleanup debounce
+    }, [searchQuery, debouncedFilter]);
+
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -57,11 +83,11 @@ const ItemsProp = ({ excludeUserId, filterCategory }) => {
         );
     }
 
-    if (products.length === 0) {
+    if (filteredProducts.length === 0) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
                 <Text style={{ fontSize: 16, fontWeight: 'bold', color: 'gray' }}>
-                    Tidak ada barang di kategori ini.
+                    Tidak ada barang yang ditemukan.
                 </Text>
             </View>
         );
@@ -69,10 +95,10 @@ const ItemsProp = ({ excludeUserId, filterCategory }) => {
 
     return (
         <FlatList
-            data={products}
+            data={filteredProducts}
             keyExtractor={(item) => item.id}
-            numColumns={3} // Menentukan jumlah kolom
-            columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 10 }} // Style untuk baris
+            numColumns={3}
+            columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 10 }}
             renderItem={({ item }) => (
                 <TouchableOpacity
                     onPress={() =>
@@ -89,7 +115,7 @@ const ItemsProp = ({ excludeUserId, filterCategory }) => {
                         shadowOpacity: 0.1,
                         elevation: 3,
                         padding: 8,
-                        width: '30%', // Lebar kotak dalam baris
+                        width: '30%',
                     }}
                 >
                     {item.image_url && (
