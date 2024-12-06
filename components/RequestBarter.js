@@ -171,9 +171,6 @@ const RequestBarter = ({ visible, onClose }) => {
                 </Text>
                 <Text style={styles.cardText}>Barang Anda: {item.ownerProductName}</Text>
                 <Text style={styles.cardText}>
-                    Jumlah Barang Anda: {item.exchangeQty || 'Tidak tersedia'}
-                </Text>
-                <Text style={styles.cardText}>
                     Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
                 </Text>
                 <Text style={styles.cardText}>Barang Ditawarkan: {item.requesterProductName}</Text>
