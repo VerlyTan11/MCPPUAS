@@ -45,64 +45,74 @@ const RequestBarter = ({ visible, onClose }) => {
     };
 
     const fetchRequests = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, 'barterRequests'));
-            const fetchedRequests = await Promise.all(
-                querySnapshot.docs.map(async (doc) => {
-                    const data = doc.data();
-                    const requesterInfo = await fetchUserInfo(data.requesterId);
-                    const ownerInfo = await fetchUserInfo(data.ownerId);
+    try {
+        const querySnapshot = await getDocs(collection(db, 'barterRequests'));
+        const fetchedRequests = await Promise.all(
+            querySnapshot.docs.map(async (doc) => {
+                const data = doc.data();
+                const requesterInfo = await fetchUserInfo(data.requesterId);
+                const ownerInfo = await fetchUserInfo(data.ownerId);
+
+                return {
+                    id: doc.id,
+                    ...data,
+                    requesterName: requesterInfo.name,
+                    requesterPhone: requesterInfo.telp,
+                    ownerName: ownerInfo.name,
+                    ownerPhone: ownerInfo.telp,
+                    exchangeQty: data.exchangeQty || 'N/A',
+                    requesterQuantity: data.requesterQuantity || 'N/A',
+                };
+            })
+        );
+
+        const filteredRequests = fetchedRequests
+            .filter(
+                (item) =>
+                    item.requesterId === auth.currentUser.uid ||
+                    item.ownerId === auth.currentUser.uid 
+            )
+            .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+        setRequests(filteredRequests);
+    } catch (error) {
+        console.error('Error fetching barter requests:', error);
+    }
+};
     
-                    return {
-                        id: doc.id,
-                        ...data,
-                        requesterName: requesterInfo.name,
-                        requesterPhone: requesterInfo.telp,
-                        ownerName: ownerInfo.name,
-                        ownerPhone: ownerInfo.telp,
-                        exchangeQty: data.exchangeQty || 'N/A',
-                        requesterQuantity: data.requesterQuantity || 'N/A',
-                    };
-                })
-            );
-            const filteredRequests = fetchedRequests
-                .filter((request) => !request.processed)
-                .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
-            setRequests(filteredRequests);
-        } catch (error) {
-            console.error('Error fetching barter requests:', error);
-        }
-    };
-    
-    const fetchHistory = async () => {
-        try {
-            const querySnapshot = await getDocs(collection(db, 'barterHistory'));
-            const fetchedHistory = await Promise.all(
-                querySnapshot.docs.map(async (doc) => {
-                    const data = doc.data();
-                    const requesterInfo = await fetchUserInfo(data.requesterId);
-                    const ownerInfo = await fetchUserInfo(data.ownerId);
-    
-                    return {
-                        id: doc.id,
-                        ...data,
-                        requesterName: requesterInfo.name,
-                        requesterPhone: requesterInfo.telp,
-                        ownerName: ownerInfo.name,
-                        ownerPhone: ownerInfo.telp,
-                        exchangeQty: data.exchangeQty || 'N/A',
-                        requesterQuantity: data.requesterQuantity || 'N/A',
-                    };
-                })
-            );
-            const filteredHistory = fetchedHistory.sort(
-                (a, b) => b.timestamp.seconds - a.timestamp.seconds
-            );
-            setHistory(filteredHistory);
-        } catch (error) {
-            console.error('Error fetching barter history:', error);
-        }
-    };    
+   const fetchHistory = async () => {
+    try {
+        const querySnapshot = await getDocs(collection(db, 'barterHistory'));
+        const fetchedHistory = await Promise.all(
+            querySnapshot.docs.map(async (doc) => {
+                const data = doc.data();
+                const requesterInfo = await fetchUserInfo(data.requesterId);
+                const ownerInfo = await fetchUserInfo(data.ownerId);
+
+                return {
+                    id: doc.id,
+                    ...data,
+                    requesterName: requesterInfo.name,
+                    requesterPhone: requesterInfo.telp,
+                    ownerName: ownerInfo.name,
+                    ownerPhone: ownerInfo.telp,
+                    exchangeQty: data.exchangeQty || 'N/A',
+                    requesterQuantity: data.requesterQuantity || 'N/A',
+                };
+            })
+        );
+
+        const filteredHistory = fetchedHistory
+            .filter(
+                (item) =>
+                    item.requesterId === auth.currentUser.uid ||
+                    item.ownerId === auth.currentUser.uid
+            )
+            .sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+        setHistory(filteredHistory);
+    } catch (error) {
+        console.error('Error fetching barter history:', error);
+    }
+};
 
     const handleResponse = async (requestId, isAccepted, request) => {
         try {
@@ -163,7 +173,7 @@ const RequestBarter = ({ visible, onClose }) => {
                                 ? `Permintaan dari ${item.requesterName} (${item.requesterPhone})`
                                 : `Permintaan terkirim ke ${item.ownerName} (${item.ownerPhone})`}
                         </Text>
-                        <Text className="text-gray-600">Barang Anda: {item.ownerProductName}</Text>
+                        <Text className="text-gray-600">Barang Diminta: {item.ownerProductName}</Text>
                         <Text className="text-gray-600">
                             Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
                         </Text>
@@ -213,39 +223,51 @@ const RequestBarter = ({ visible, onClose }) => {
         );
     };
 
-    const renderHistory = ({ item }) => (
-        <View className="bg-gray-100 p-4 rounded-lg mb-2">
-            <Text className="text-lg font-bold">
-                Barter {item.status === 'accepted' ? 'Berhasil' : 'Ditolak'} dengan{' '}
-                {item.ownerId === auth.currentUser .uid ? item.requesterName : item.ownerName} (
-                {item.ownerId === auth.currentUser .uid ? item.requesterPhone : item.ownerPhone})
-            </Text>
-            <Text className="text-gray-600">Barang Anda: {item.ownerProductName}</Text>
-            <Text className="text-gray-600">
-                Jumlah Barang Anda: {item.exchangeQty || 'Tidak tersedia'}
-            </Text>
-            <Text className="text-gray-600">Barang Barter: {item.requesterProductName}</Text>
-            <Text className="text-gray-600">
-                Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
-            </Text>
-            <Text className="text-gray-600">
-                Tanggal: {new Date(item.timestamp.seconds * 1000).toLocaleString()}
-            </Text>
-
-            {item.ownerProductImage && (
-                <Image
-                    source={{ uri: item.ownerProductImage }}
-                    className="w-12 h-12 rounded-lg mt-1"
-                />
- )}
-            {item.requesterProductImage && (
-                <Image
-                    source={{ uri: item.requesterProductImage }}
-                    className="w-12 h-12 rounded-lg mt-1"
-                />
-            )}
-        </View>
-    );
+    const renderHistory = ({ item }) => {
+        const isOwner = item.ownerId === auth.currentUser.uid;
+    
+        return (
+            <View className="bg-gray-100 p-4 rounded-lg mb-2">
+                <View className="flex flex-row justify-between items-center">
+                    <View className="flex-1">
+                        <Text className="text-lg font-bold">
+                            {isOwner
+                                ? `Riwayat Barter dengan ${item.requesterName} (${item.requesterPhone})`
+                                : `Riwayat Barter dengan ${item.ownerName} (${item.ownerPhone})`}
+                        </Text>
+                        <Text className={`text-sm font-bold ${item.status === 'accepted' ? 'text-green-600' : 'text-red-600'}`}>
+                            Status: {item.status === 'accepted' ? 'Diterima' : 'Ditolak'}
+                        </Text>
+                        <Text className="text-gray-600">Barang Diminta: {item.ownerProductName}</Text>
+                        <Text className="text-gray-600">
+                            Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
+                        </Text>
+                        <Text className="text-gray-600">Barang Ditawarkan: {item.requesterProductName}</Text>
+                        <Text className="text-gray-600">
+                            Jumlah Ditawarkan: {item.exchangeQty || 'Tidak tersedia'}
+                        </Text>
+                        <Text className="text-gray-600">
+                            Tanggal: {new Date(item.timestamp.seconds * 1000).toLocaleString()}
+                        </Text>
+                    </View>
+                    <View className="justify-center items-end">
+                        {item.ownerProductImage && (
+                            <Image
+                                source={{ uri: item.ownerProductImage }}
+                                className="w-12 h-12 rounded-lg mt-1"
+                            />
+                        )}
+                        {item.requesterProductImage && (
+                            <Image
+                                source={{ uri: item.requesterProductImage }}
+                                className="w-12 h-12 rounded-lg mt-1"
+                            />
+                        )}
+                    </View>
+                </View>
+            </View>
+        );
+    };    
 
     return (
         <Modal
@@ -260,41 +282,50 @@ const RequestBarter = ({ visible, onClose }) => {
                         <View className="bg-white w-11/12 h-4/5 rounded-lg p-4">
                             <View className="flex flex-row mb-4">
                                 <TouchableOpacity
-                                    className={`flex-1 items-center py-2 border-b-2 ${activeTab === 'requests' ? 'border-gray-700' : 'border-transparent'}`}
+                                    className={`flex-1 items-center py-2 border-b-2 ${
+                                        activeTab === 'requests' ? 'border-gray-700' : 'border-transparent'
+                                    }`}
                                     onPress={() => setActiveTab('requests')}
                                 >
-                                    <Text className={`font-bold ${activeTab === 'requests' ? 'text-green-700' : 'text-green-900'}`}>
+                                    <Text
+                                        className={`font-bold ${
+                                            activeTab === 'requests' ? 'text-green-700' : 'text-green-900'
+                                        }`}
+                                    >
                                         Permintaan
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    className={`flex-1 items-center py-2 border-b-2 ${activeTab === 'history' ? 'border-gray-700' : 'border-transparent'}`}
+                                    className={`flex-1 items-center py-2 border-b-2 ${
+                                        activeTab === 'history' ? 'border-gray-700' : 'border-transparent'
+                                    }`}
                                     onPress={() => setActiveTab('history')}
                                 >
-                                    <Text className={`font-bold ${activeTab === 'history' ? 'text-green-700' : 'text-green-900'}`}>
+                                    <Text
+                                        className={`font-bold ${
+                                            activeTab === 'history' ? 'text-green-700' : 'text-green-900'
+                                        }`}
+                                    >
                                         Riwayat
                                     </Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    className="ml-2"
-                                    onPress={() => onClose()}
-                                >
+                                <TouchableOpacity className="ml-2" onPress={() => onClose()}>
                                     <Text className="text-xl">×</Text>
                                 </TouchableOpacity>
                             </View>
                             <FlatList
                                 data={activeTab === 'requests' ? requests : history}
-                                renderItem={
-                                    activeTab === 'requests' ? renderRequests : renderHistory
-                                }
+                                renderItem={activeTab === 'requests' ? renderRequests : renderHistory}
                                 keyExtractor={(item) => item.id}
                                 ListEmptyComponent={
                                     <Text className="text-center text-gray-600 mt-4">
-                                        Belum ada{' '}
-                                        {activeTab === 'requests' ? 'permintaan' : 'riwayat'} barter.
+                                        Belum ada {activeTab === 'requests' ? 'permintaan' : 'riwayat'} barter.
                                     </Text>
                                 }
+                                contentContainerStyle={{ paddingBottom: 16 }}
+                                showsVerticalScrollIndicator={true}
+                                keyboardShouldPersistTaps="handled"
                             />
                         </View>
                     </TouchableWithoutFeedback>
