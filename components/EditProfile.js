@@ -98,11 +98,11 @@ const EditProfile = () => {
         name: name,
         telp: telp,
         email: email,
-        photo_url: profileImage || '', // Simpan URL gambar atau kosong jika tidak ada
+        photo_url: profileImage || '', 
       });
 
       Alert.alert('Berhasil', 'Profil berhasil diperbarui');
-      navigation.navigate('Profile'); // Kembali ke halaman Profil
+      navigation.navigate('Profile');
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Gagal memperbarui profil');
@@ -148,9 +148,9 @@ const EditProfile = () => {
         placeholder="Email" 
         value={email}
         onChangeText={setEmail}
-        editable={false} // Membuat input tidak dapat diedit
+        editable={false}
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
-        style={{ color: '#A9A9A9' }} // Memberikan gaya tambahan agar terlihat disable
+        style={{ color: '#A9A9A9' }}
       />
 
       <LinearGradient 

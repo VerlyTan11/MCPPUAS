@@ -4,12 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
 import { doc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import RequestBarter from './RequestBarter'; // Import komponen RequestBarter
+import RequestBarter from './RequestBarter';
 
 const Profile = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [barterModalVisible, setBarterModalVisible] = useState(false); // State untuk modal Request Barter
+  const [barterModalVisible, setBarterModalVisible] = useState(false);
   const [userData, setUserData] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,6 @@ const Profile = () => {
       return;
     }
 
-    // Realtime listener untuk data pengguna
     const userDocRef = doc(db, 'users', user.uid);
     const unsubscribeUser = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -31,7 +30,6 @@ const Profile = () => {
       }
     });
 
-    // Realtime listener untuk postingan pengguna
     const fetchProducts = () => {
       const productsRef = collection(db, 'products');
       const q = query(productsRef, where('userId', '==', user.uid));
@@ -50,7 +48,6 @@ const Profile = () => {
 
     const unsubscribeProducts = fetchProducts();
 
-    // Cleanup listener saat komponen di-unmount
     return () => {
       unsubscribeUser();
       unsubscribeProducts();
@@ -155,7 +152,6 @@ const Profile = () => {
         )}
       </View>
 
-      {/* Postingan Produk */}
       <View className="flex-1 bg-gray-100 p-4">
         <Text className="text-lg font-bold mb-4">Your Posts</Text>
         <FlatList
@@ -205,7 +201,6 @@ const Profile = () => {
         </View>
       </Modal>
 
-      {/* Request Barter Modal */}
       <RequestBarter visible={barterModalVisible} onClose={() => setBarterModalVisible(false)} />
     </SafeAreaProvider>
   );

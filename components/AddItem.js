@@ -6,18 +6,18 @@ import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { db, auth } from '../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useDispatch } from 'react-redux'; // Import Redux hook
-import { addItem } from '../redux/itemsSlice'; // Import action untuk Redux
+import { useDispatch } from 'react-redux';
+import { addItem } from '../redux/itemsSlice';
 
 const AddItem = () => {
     const navigation = useNavigation();
-    const dispatch = useDispatch(); // Inisialisasi dispatch Redux
+    const dispatch = useDispatch();
     const [selectedImage, setSelectedImage] = useState(null);
     const [formData, setFormData] = useState({
         alamat: '',
         berat: '',
         catatan: '',
-        jenis: '', // Default jenis kosong untuk placeholder
+        jenis: '',
         jumlah: '',
         kode_pos: '',
         nama_product: '',
@@ -89,10 +89,8 @@ const AddItem = () => {
                 userId: user.uid,
             };
 
-            // Simpan data ke Firestore
             const docRef = await addDoc(collection(db, 'products'), data);
 
-            // Simpan data ke Redux store
             dispatch(addItem({ id: docRef.id, ...data }));
 
             Alert.alert('Success', 'Product added successfully!');
@@ -139,7 +137,7 @@ const AddItem = () => {
                     <Picker.Item 
                         label="Pilih Jenis Produk" 
                         value="" 
-                        color="#888" // Warna lebih terang untuk placeholder
+                        color="#888"
                     />
                     <Picker.Item label="Kardus" value="kardus" />
                     <Picker.Item label="Kain" value="kain" />

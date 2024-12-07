@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import debounce from 'lodash.debounce';
-import { useSelector } from 'react-redux'; // Import Redux hook
+import { useSelector } from 'react-redux';
 
 const ItemsProp = ({ excludeUserId }) => {
     const navigation = useNavigation();
@@ -12,11 +12,9 @@ const ItemsProp = ({ excludeUserId }) => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Ambil kategori dan pencarian dari Redux
     const filterCategory = useSelector((state) => state.category.selected);
     const searchQuery = useSelector((state) => state.search.query);
 
-    // Ambil data produk dari Firestore
     useEffect(() => {
         let productsRef = collection(db, 'products');
 
@@ -45,7 +43,7 @@ const ItemsProp = ({ excludeUserId }) => {
                 });
 
                 setProducts(productsList);
-                setFilteredProducts(productsList); // Default filter
+                setFilteredProducts(productsList);
                 setLoading(false);
             },
             (error) => {
@@ -57,7 +55,6 @@ const ItemsProp = ({ excludeUserId }) => {
         return () => unsubscribe();
     }, [excludeUserId, filterCategory]);
 
-    // Debounce fungsi filter
     const debouncedFilter = useMemo(
         () =>
             debounce((query) => {
@@ -70,14 +67,13 @@ const ItemsProp = ({ excludeUserId }) => {
                 } else {
                     setFilteredProducts(products);
                 }
-            }, 100), // Kurangi debounce delay untuk lebih responsif
+            }, 100),
         [products]
     );
 
-    // Perbarui filter ketika searchQuery berubah
     useEffect(() => {
         debouncedFilter(searchQuery);
-        return () => debouncedFilter.cancel(); // Cleanup debounce
+        return () => debouncedFilter.cancel();
     }, [searchQuery, debouncedFilter]);
 
     if (loading) {

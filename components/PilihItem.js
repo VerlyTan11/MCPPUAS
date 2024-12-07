@@ -14,7 +14,7 @@ const PilihItem = () => {
     const [inputQty, setInputQty] = useState('');
     const [exchangeQty, setExchangeQty] = useState('');
 
-    // Fetch user's products
+
     useEffect(() => {
         const fetchUserProducts = async () => {
             try {

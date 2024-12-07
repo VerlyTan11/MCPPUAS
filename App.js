@@ -2,8 +2,8 @@ import React from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Provider } from 'react-redux'; // Import Provider dari react-redux
-import store from './redux/store'; // Import store Redux
+import { Provider } from 'react-redux';
+import store from './redux/store';
 import Splash from './components/Splash';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -24,7 +24,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <Provider store={store}> {/* Bungkus aplikasi dengan Redux Provider */}
+    <Provider store={store}>
       <SafeAreaProvider>
         <NavigationContainer>
           <SafeAreaView style={{ flex: 1 }}>

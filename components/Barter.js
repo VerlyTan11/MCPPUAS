@@ -19,7 +19,6 @@ const Barter = () => {
     const [requesterProduct, setRequesterProduct] = useState(null);
     const [owner, setOwner] = useState(null);
 
-    // Fetch product data
     useEffect(() => {
         const fetchProductData = async () => {
             try {
@@ -29,7 +28,6 @@ const Barter = () => {
                     if (ownerProductSnap.exists()) {
                         setOwnerProduct({ id: ownerProductId, ...ownerProductSnap.data() });
 
-                        // Fetch owner details
                         const ownerRef = doc(db, 'users', ownerProductSnap.data().userId);
                         const ownerSnap = await getDoc(ownerRef);
                         if (ownerSnap.exists()) {
@@ -103,7 +101,6 @@ const Barter = () => {
     return (
         <View className="flex-1 bg-white p-4">
             <View className="flex-row justify-around items-center mb-6">
-                {/* Barang pengguna */}
                 <View className="items-center">
                     <Image
                         source={
@@ -126,7 +123,6 @@ const Barter = () => {
                     className="w-6 h-6 rounded-lg mb-2"
                 />
 
-                {/* Barang yang dipilih */}
                 <View className="items-center">
                     <Image
                         source={

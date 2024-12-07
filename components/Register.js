@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, ScrollView } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore'; // Gunakan setDoc untuk menyimpan dengan ID tertentu
+import { doc, setDoc } from 'firebase/firestore';
 
 const Register = () => {
     const navigation = useNavigation();
@@ -26,17 +26,14 @@ const Register = () => {
         }
     
         try {
-            // Buat akun pengguna di Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const { uid } = userCredential.user; // Ambil UID pengguna yang baru dibuat
+            const { uid } = userCredential.user;
     
-            // Simpan data pengguna ke Firestore dengan id yang sama dengan UID
             await setDoc(doc(db, 'users', uid), {
-                name,  // Simpan nama pengguna
-                email, // Simpan email pengguna
+                name,  
+                email,
             });
     
-            // Tampilkan pop-up dan arahkan ke halaman login
             alert('Account created successfully!');
             navigation.navigate('Login');
         } catch (error) {

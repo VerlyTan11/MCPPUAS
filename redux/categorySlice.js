@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    selected: null, // Tidak ada kategori yang dipilih secara default
+    selected: null,
 };
 
 const categorySlice = createSlice({

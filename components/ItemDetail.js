@@ -13,7 +13,6 @@ const ItemDetail = () => {
     const [product, setProduct] = useState(null);
     const [owner, setOwner] = useState(null);
 
-    // Fungsi untuk Fetch Data
     const fetchProductDetails = async () => {
         try {
             if (!itemId) {
@@ -29,14 +28,14 @@ const ItemDetail = () => {
                 const productData = productSnapshot.data();
                 setProduct({ ...productData, id: itemId });
 
-                const ownerRef = doc(db, 'users', productData.userId); // Ambil userId dari data produk
+                const ownerRef = doc(db, 'users', productData.userId);
                 const ownerSnapshot = await getDoc(ownerRef);
 
                 if (ownerSnapshot.exists()) {
-                    setOwner(ownerSnapshot.data()); // Simpan data pemilik
+                    setOwner(ownerSnapshot.data());
                 } else {
                     console.warn('Owner not found');
-                    setOwner({ name: 'Unknown User', email: 'Not available', photo_url: null }); // Data fallback
+                    setOwner({ name: 'Unknown User', email: 'Not available', photo_url: null });
                 }
             } else {
                 Alert.alert('Error', 'Product not found!');
@@ -48,7 +47,6 @@ const ItemDetail = () => {
         }
     };
 
-    // Fetch data saat halaman dimuat atau layar kembali fokus
     useEffect(() => {
         if (isFocused) {
             fetchProductDetails();
@@ -67,7 +65,6 @@ const ItemDetail = () => {
 
     return (
         <ScrollView className="flex-1 bg-gray-100 p-4">
-            {/* Back Button */}
             <View className="flex-row items-center mb-4">
                 <TouchableOpacity onPress={() => navigation.goBack()} className="p-2 bg-gray-200 rounded-full">
                     <Image source={require('../assets/back.png')} className="w-8 h-8" />
@@ -75,7 +72,6 @@ const ItemDetail = () => {
                 <Text className="ml-4 text-lg font-semibold text-gray-800">Detail Produk</Text>
             </View>
 
-            {/* Product Image */}
             <View className="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
                 <Image 
                     source={product.image_url ? { uri: product.image_url } : require('../assets/kardus.jpg')}
@@ -84,7 +80,6 @@ const ItemDetail = () => {
                 />
             </View>
 
-            {/* Owner Information */}
             <View className="flex-row items-center bg-white p-4 rounded-lg shadow-md mb-4">
                 <Image 
                     source={owner.photo_url ? { uri: owner.photo_url } : require('../assets/user.png')}
@@ -96,25 +91,21 @@ const ItemDetail = () => {
                 </View>
             </View>
 
-            {/* Product Details */}
             <View className="bg-white p-4 rounded-lg shadow-md mb-4">
                 <Text className="text-xl font-bold text-gray-800 mb-2">{product.nama_product}</Text>
                 <Text className="text-gray-500 text-sm mb-4">
                     {new Date(product.timestamp).toLocaleString() || 'Unknown time'}
                 </Text>
 
-                {/* Tags */}
                 <View className="flex-row flex-wrap mb-4">
                     <Text className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs mr-2 mb-2">Barter Online</Text>
                     <Text className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs mr-2 mb-2">Best Product</Text>
                 </View>
 
-                {/* Description */}
                 <Text className="text-gray-800 font-semibold mb-2">Catatan</Text>
                 <Text className="text-gray-700">{product.catatan || 'No notes available.'}</Text>
             </View>
 
-            {/* Additional Details */}
             <View className="bg-white p-4 rounded-lg shadow-md mb-6">
                 <Text className="text-gray-800 font-semibold mb-2">Detail Tambahan</Text>
                 <Text className="text-gray-700 mb-2">Alamat: {product.alamat || 'N/A'}</Text>
@@ -125,7 +116,6 @@ const ItemDetail = () => {
                 <Text className="text-gray-700">No Rumah: {product.no_rumah || 'N/A'}</Text>
             </View>
 
-            {/* Action Button */}
             <LinearGradient 
                 colors={['#697565', '#ECDFCC']}
                 start={{ x: 0, y: 0 }}

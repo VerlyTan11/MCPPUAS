@@ -9,7 +9,7 @@ import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 const EditItem = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { itemId } = route.params || {}; // Mendapatkan itemId dari parameter route
+    const { itemId } = route.params || {};
 
     const [product, setProduct] = useState({
         nama_product: '',
@@ -25,7 +25,6 @@ const EditItem = () => {
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
 
-    // Fetch data produk dari Firestore
     useEffect(() => {
         if (!itemId) {
             Alert.alert('Error', 'Item ID is missing!');
@@ -55,7 +54,6 @@ const EditItem = () => {
         fetchProduct();
     }, [itemId]);
 
-    // Fungsi untuk mengedit gambar produk
     const handleImagePicker = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -68,7 +66,6 @@ const EditItem = () => {
         }
     };
 
-    // Fungsi untuk mengupdate produk
     const handleUpdateProduct = async () => {
         try {
             if (!product.nama_product.trim()) {
@@ -88,7 +85,6 @@ const EditItem = () => {
         }
     };
 
-    // Fungsi untuk menghapus produk
     const handleDeleteProduct = async () => {
         try {
             const docRef = doc(db, 'products', itemId);
@@ -115,7 +111,6 @@ const EditItem = () => {
 
     return (
         <ScrollView className="flex-1 bg-white p-8">
-            {/* Header dengan tombol kembali dan delete */}
             <View className="flex-row items-center justify-between mb-4">
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image source={require('../assets/back.png')} className="w-10 h-10" />
@@ -133,7 +128,6 @@ const EditItem = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Gambar Produk */}
             <View className="relative">
                 <TouchableOpacity onPress={handleImagePicker}>
                     <Image 
@@ -144,7 +138,6 @@ const EditItem = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Form Edit Produk */}
             {[
                 { label: 'Nama Produk', value: 'nama_product', placeholder: 'Nama Produk' },
                 { label: 'Jenis Produk', value: 'jenis', placeholder: 'Jenis Produk' },
@@ -166,7 +159,6 @@ const EditItem = () => {
                 </View>
             ))}
 
-            {/* Tombol Update */}
             <LinearGradient 
                 colors={['#697565', '#ECDFCC']}
                 start={{ x: 0, y: 0 }}
@@ -181,10 +173,8 @@ const EditItem = () => {
                 </TouchableOpacity>
             </LinearGradient>
 
-            {/* Jarak tambahan di bawah tombol */}
             <View style={{ marginBottom: 20 }}></View>
 
-            {/* Modal Konfirmasi Delete */}
             <Modal
                 transparent={true}
                 visible={modalVisible}

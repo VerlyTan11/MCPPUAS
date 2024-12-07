@@ -13,7 +13,7 @@ const itemsSlice = createSlice({
         addItem(state, action) {
             state.items.push({
             ...action.payload,
-            timestamp: new Date(action.payload.timestamp).toISOString(), // Konversi ke ISO string
+            timestamp: new Date(action.payload.timestamp).toISOString(),
         });
         },
         setLoading(state, action) {

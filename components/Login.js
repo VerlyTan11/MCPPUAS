@@ -5,9 +5,9 @@ import { auth } from '../firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as LocalAuthentication from 'expo-local-authentication';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Tambahkan AsyncStorage
-import { useDispatch } from 'react-redux'; // Tambahkan import Redux
-import { setUser } from '../redux/authSlice'; // Tambahkan action Redux
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/authSlice';
 
 const Login = () => {
     const [isBiometricSupported, setIsBiometricSupported] = useState(false);
@@ -15,9 +15,8 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const dispatch = useDispatch(); // Inisialisasi dispatch Redux
+    const dispatch = useDispatch();
 
-    // Fungsi untuk login menggunakan email dan password
     const handleLogin = async () => {
         if (!email || !password) {
             alert('Please enter both email and password');
@@ -25,27 +24,24 @@ const Login = () => {
         }
     
         try {
-            // Login menggunakan email dan password
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Simpan ke Redux state
             dispatch(setUser({ uid: user.uid, email: user.email }));
 
-            await AsyncStorage.setItem('userEmail', email); // Simpan email ke AsyncStorage
+            await AsyncStorage.setItem('userEmail', email);
     
-            // Jika login berhasil, lanjutkan ke verifikasi biometrik
             const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
             if (!isBiometricAvailable) {
                 alert('Biometric authentication is not supported on this device.');
-                navigation.navigate('Home'); // Langsung ke Home jika biometrik tidak tersedia
+                navigation.navigate('Home');
                 return;
             }
     
             const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
             if (!savedBiometrics) {
                 alert('No biometric record found. Proceeding without biometric verification.');
-                navigation.navigate('Home'); // Langsung ke Home jika biometrik tidak terdaftar
+                navigation.navigate('Home');
                 return;
             }
     
@@ -83,7 +79,6 @@ const Login = () => {
             { text: 'Proceed', onPress: () => navigation.navigate('Home', { email: userEmail }) },
         ]);
 
-    // Fungsi untuk otentikasi biometrik
     const handleBiometricAuth = async () => {
         const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
         if (!isBiometricAvailable) {
@@ -112,7 +107,7 @@ const Login = () => {
         });
 
         if (biometricAuth.success) {
-            const userEmail = await AsyncStorage.getItem('userEmail'); // Ambil email dari AsyncStorage
+            const userEmail = await AsyncStorage.getItem('userEmail');
             if (userEmail) {
                 TwoButtonAlert(userEmail);
             } else {
@@ -122,7 +117,7 @@ const Login = () => {
     };
 
     useEffect(() => {
-        let isMounted = true; // Track whether the component is mounted
+        let isMounted = true; 
         (async () => {
             const compatible = await LocalAuthentication.hasHardwareAsync();
             if (isMounted) {
@@ -131,7 +126,7 @@ const Login = () => {
         })();
 
         return () => {
-            isMounted = false; // Cleanup on unmount
+            isMounted = false;
         };
     }, []);
 

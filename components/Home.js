@@ -15,15 +15,15 @@ import ItemsProp from './ItemsProp';
 import FloatingAddButton from './FloatingAddButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { auth } from '../firebaseConfig';
-import { useSelector, useDispatch } from 'react-redux'; // Import Redux hooks
-import { setSearchQuery } from '../redux/searchSlice'; // Import action untuk pencarian
-import { setCategory } from '../redux/categorySlice'; // Import action untuk kategori
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearchQuery } from '../redux/searchSlice';
+import { setCategory } from '../redux/categorySlice';
 
 const Home = ({ navigation }) => {
     const currentUser = auth.currentUser;
-    const dispatch = useDispatch(); // Inisialisasi dispatch Redux
-    const searchQuery = useSelector((state) => state.search.query); // Ambil state pencarian dari Redux
-    const selectedCategory = useSelector((state) => state.category.selected); // Ambil kategori terpilih dari Redux
+    const dispatch = useDispatch();
+    const searchQuery = useSelector((state) => state.search.query);
+    const selectedCategory = useSelector((state) => state.category.selected);
     const [triggeredSearchQuery, setTriggeredSearchQuery] = useState('');
     const inputRef = useRef(null);
 
@@ -45,14 +45,14 @@ const Home = ({ navigation }) => {
     };
 
     const handleSearchChange = (text) => {
-        dispatch(setSearchQuery(text)); // Update query pencarian di Redux
+        dispatch(setSearchQuery(text));
         if (text.trim() === '') {
             setTriggeredSearchQuery('');
         }
     };
 
     const handleCategorySelect = (category) => {
-        dispatch(setCategory(category === selectedCategory ? null : category)); // Update kategori di Redux
+        dispatch(setCategory(category === selectedCategory ? null : category));
     };
 
     const renderHeader = () => (

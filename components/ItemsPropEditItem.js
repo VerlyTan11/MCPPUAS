@@ -9,14 +9,12 @@ const ItemsProEditItem = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch user products with real-time listener
     const fetchUserProducts = () => {
         try {
             const userId = auth.currentUser.uid;
             const productsRef = collection(db, 'products');
             const q = query(productsRef, where('userId', '==', userId));
 
-            // Real-time listener to auto-update the products list
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const productsList = [];
                 querySnapshot.forEach((doc) => {
@@ -27,10 +25,9 @@ const ItemsProEditItem = () => {
                 });
 
                 setProducts(productsList);
-                setLoading(false);  // Set loading to false once data is fetched
+                setLoading(false);
             });
 
-            // Return the unsubscribe function to stop listening to updates when the component unmounts
             return unsubscribe;
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -40,7 +37,6 @@ const ItemsProEditItem = () => {
     useEffect(() => {
         const unsubscribe = fetchUserProducts();
 
-        // Cleanup the listener when the component unmounts
         return () => unsubscribe();
     }, []);
 

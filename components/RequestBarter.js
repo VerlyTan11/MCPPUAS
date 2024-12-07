@@ -21,7 +21,7 @@ import {
 import { db, auth } from '../firebaseConfig';
 
 const RequestBarter = ({ visible, onClose }) => {
-    const [activeTab, setActiveTab] = useState('requests'); // 'requests' atau 'history'
+    const [activeTab, setActiveTab] = useState('requests');
     const [requests, setRequests] = useState([]);
     const [history, setHistory] = useState([]);
 
@@ -55,13 +55,13 @@ const RequestBarter = ({ visible, onClose }) => {
     
                     return {
                         id: doc.id,
-                        ...data, // Ambil semua data dari Firebase
+                        ...data,
                         requesterName: requesterInfo.name,
                         requesterPhone: requesterInfo.telp,
                         ownerName: ownerInfo.name,
                         ownerPhone: ownerInfo.telp,
-                        exchangeQty: data.exchangeQty || 'N/A', // Jumlah barang ditawarkan
-                        requesterQuantity: data.requesterQuantity || 'N/A', // Jumlah barang diminta
+                        exchangeQty: data.exchangeQty || 'N/A',
+                        requesterQuantity: data.requesterQuantity || 'N/A',
                     };
                 })
             );
@@ -90,8 +90,8 @@ const RequestBarter = ({ visible, onClose }) => {
                         requesterPhone: requesterInfo.telp,
                         ownerName: ownerInfo.name,
                         ownerPhone: ownerInfo.telp,
-                        exchangeQty: data.exchangeQty || 'N/A', // Jumlah barang ditawarkan
-                        requesterQuantity: data.requesterQuantity || 'N/A', // Jumlah barang diminta
+                        exchangeQty: data.exchangeQty || 'N/A',
+                        requesterQuantity: data.requesterQuantity || 'N/A',
                     };
                 })
             );
@@ -107,40 +107,34 @@ const RequestBarter = ({ visible, onClose }) => {
     const handleResponse = async (requestId, isAccepted, request) => {
         try {
             if (isAccepted) {
-                // Tambahkan ke history dengan status 'accepted'
                 await addDoc(collection(db, 'barterHistory'), {
                     ...request,
                     status: 'accepted',
                     timestamp: serverTimestamp(),
                 });
     
-                // Kurangi stok barang owner
                 const ownerProductRef = doc(db, 'products', request.ownerProductId);
                 const ownerProductDoc = await getDoc(ownerProductRef);
                 if (ownerProductDoc.exists()) {
                     const ownerData = ownerProductDoc.data();
-                    const currentOwnerQty = parseInt(ownerData.jumlah, 10) || 0; // Pastikan nilai angka
-                    const requestQty = parseInt(request.requesterQuantity, 10) || 0; // Jumlah diminta
+                    const currentOwnerQty = parseInt(ownerData.jumlah, 10) || 0;
+                    const requestQty = parseInt(request.requesterQuantity, 10) || 0;
                     const updatedOwnerQty = currentOwnerQty - requestQty;
     
-                    // Pastikan jumlah tidak negatif
                     await updateDoc(ownerProductRef, { jumlah: Math.max(0, updatedOwnerQty) });
                 }
     
-                // Kurangi stok barang requester
                 const requesterProductRef = doc(db, 'products', request.requesterProductId);
                 const requesterProductDoc = await getDoc(requesterProductRef);
                 if (requesterProductDoc.exists()) {
                     const requesterData = requesterProductDoc.data();
-                    const currentRequesterQty = parseInt(requesterData.jumlah, 10) || 0; // Pastikan nilai angka
-                    const exchangeQty = parseInt(request.exchangeQty, 10) || 0; // Barang untuk ditukar
+                    const currentRequesterQty = parseInt(requesterData.jumlah, 10) || 0;
+                    const exchangeQty = parseInt(request.exchangeQty, 10) || 0;
                     const updatedRequesterQty = currentRequesterQty - exchangeQty;
     
-                    // Pastikan jumlah tidak negatif
                     await updateDoc(requesterProductRef, { jumlah: Math.max(0, updatedRequesterQty) });
                 }
             } else {
-                // Tambahkan ke history dengan status 'rejected'
                 await addDoc(collection(db, 'barterHistory'), {
                     ...request,
                     status: 'rejected',
@@ -148,10 +142,8 @@ const RequestBarter = ({ visible, onClose }) => {
                 });
             }
     
-            // Hapus permintaan dari database
             await deleteDoc(doc(db, 'barterRequests', requestId));
     
-            // Refresh data
             fetchRequests();
             fetchHistory();
         } catch (error) {
