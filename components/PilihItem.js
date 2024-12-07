@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { collection, getDocs, where, query } from 'firebase/firestore';
+import { LinearGradient } from 'expo-linear-gradient';
 import { db, auth } from '../firebaseConfig';
 
 const PilihItem = () => {
@@ -13,7 +14,6 @@ const PilihItem = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputQty, setInputQty] = useState('');
     const [exchangeQty, setExchangeQty] = useState('');
-
 
     useEffect(() => {
         const fetchUserProducts = async () => {
@@ -111,35 +111,42 @@ const PilihItem = () => {
                 transparent
                 onRequestClose={() => setModalVisible(false)}
             >
-                <View style={styles.overlay}>
-                    <View style={styles.modalContainer}>
-                        <Text style={styles.modalTitle}>Input Jumlah</Text>
+                <View className="flex-1 justify-center items-center bg-transparent">
+                    <View className="w-4/5 bg-white rounded-xl p-6 items-center shadow-lg">
+                        <Text className="text-xl font-bold text-gray-800 mb-4">Input Jumlah</Text>
                         <TextInput
                             placeholder="Jumlah barang yang diminta"
                             keyboardType="number-pad"
-                            style={styles.input}
+                            className="w-full border border-gray-300 rounded-lg p-2 mb-4 text-sm"
                             value={inputQty}
                             onChangeText={setInputQty}
                         />
                         <TextInput
                             placeholder="Jumlah barang Anda untuk ditukar"
                             keyboardType="number-pad"
-                            style={styles.input}
+                            className="w-full border border-gray-300 rounded-lg p-2 mb-6 text-sm"
                             value={exchangeQty}
                             onChangeText={setExchangeQty}
                         />
-                        <View style={styles.buttonContainer}>
+                        <View className="flex-row justify-between w-full">
                             <TouchableOpacity
-                                style={[styles.button, styles.cancelButton]}
+                                className="flex-1 bg-gray-300 py-3 rounded-lg mx-2"
                                 onPress={() => setModalVisible(false)}
                             >
-                                <Text style={styles.cancelText}>Cancel</Text>
+                                <Text className="text-center text-gray-700 font-semibold">Cancel</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.button, styles.submitButton]}
+                                className="flex-1 mx-2"
                                 onPress={handleSubmit}
                             >
-                                <Text style={styles.submitText}>Submit</Text>
+                                <LinearGradient
+                                    colors={['#697565', '#ECDFCC']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1.2, y: 0 }}
+                                    className="flex-1 items-center justify-center rounded-full"
+                                >
+                                    <Text className="text-center text-white font-semibold">Submit</Text>
+                                </LinearGradient>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -147,66 +154,6 @@ const PilihItem = () => {
             </Modal>
         </View>
     );
-};
-
-const styles = {
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContainer: {
-        width: '80%',
-        backgroundColor: 'white',
-        borderRadius: 12,
-        padding: 20,
-        alignItems: 'center',
-        elevation: 5,
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 16,
-    },
-    input: {
-        width: '100%',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 10,
-        fontSize: 14,
-        marginBottom: 12,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    button: {
-        flex: 1,
-        paddingVertical: 10,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginHorizontal: 5,
-    },
-    cancelButton: {
-        backgroundColor: '#d3d3d3',
-    },
-    cancelText: {
-        color: '#555',
-        fontWeight: 'bold',
-        fontSize: 14,
-    },
-    submitButton: {
-        backgroundColor: '#28a745',
-    },
-    submitText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 14,
-    },
 };
 
 export default PilihItem;

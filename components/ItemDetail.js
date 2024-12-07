@@ -116,14 +116,18 @@ const ItemDetail = () => {
                 <Text className="text-gray-700">No Rumah: {product.no_rumah || 'N/A'}</Text>
             </View>
 
-            <LinearGradient 
+            <LinearGradient
                 colors={['#697565', '#ECDFCC']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1.2, y: 0 }}
                 className="flex-row items-center justify-center p-4 rounded-lg shadow-md mb-8"
             >
-                <TouchableOpacity 
+                <TouchableOpacity
                     className="flex-1 items-center justify-center"
+                    style={{
+                        borderRadius: 16,
+                        overflow: 'hidden',
+                    }}
                     onPress={() => {
                         if (isUserOwner) {
                             navigation.navigate('EditItem', { itemId: product.id });

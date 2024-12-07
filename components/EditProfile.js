@@ -153,15 +153,25 @@ const EditProfile = () => {
         style={{ color: '#A9A9A9' }}
       />
 
-      <LinearGradient 
-        colors={['#697565', '#ECDFCC']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1.2, y: 0 }}
-        className="flex-row items-center justify-between rounded-lg mb-6"
+      <LinearGradient
+          colors={['#697565', '#ECDFCC']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1.2, y: 0 }}
+          className="flex-row items-center justify-between mb-6"
+          style={{
+              borderRadius: 16, 
+              overflow: 'hidden', 
+          }}
       >
-        <TouchableOpacity className="w-full py-4 items-center" onPress={handleSaveProfile}>
-          <Text className="text-white font-semibold">Simpan</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+              className="w-full py-4 items-center"
+              style={{
+                  borderRadius: 16, 
+              }}
+              onPress={handleSaveProfile}
+          >
+              <Text className="text-white font-semibold">Edit</Text>
+          </TouchableOpacity>
       </LinearGradient>
     </ScrollView>
   );

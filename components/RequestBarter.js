@@ -5,7 +5,6 @@ import {
     Modal,
     TouchableOpacity,
     FlatList,
-    StyleSheet,
     TouchableWithoutFeedback,
 } from 'react-native';
 import {
@@ -19,6 +18,7 @@ import {
     serverTimestamp,
 } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
+import { Image } from 'react-native';
 
 const RequestBarter = ({ visible, onClose }) => {
     const [activeTab, setActiveTab] = useState('requests');
@@ -128,10 +128,10 @@ const RequestBarter = ({ visible, onClose }) => {
                 const requesterProductDoc = await getDoc(requesterProductRef);
                 if (requesterProductDoc.exists()) {
                     const requesterData = requesterProductDoc.data();
-                    const currentRequesterQty = parseInt(requesterData.jumlah, 10) || 0;
+                    const currentRequesterQty = parseInt (requesterData.jumlah, 10) || 0;
                     const exchangeQty = parseInt(request.exchangeQty, 10) || 0;
                     const updatedRequesterQty = currentRequesterQty - exchangeQty;
-    
+
                     await updateDoc(requesterProductRef, { jumlah: Math.max(0, updatedRequesterQty) });
                 }
             } else {
@@ -141,79 +141,111 @@ const RequestBarter = ({ visible, onClose }) => {
                     timestamp: serverTimestamp(),
                 });
             }
-    
+
             await deleteDoc(doc(db, 'barterRequests', requestId));
-    
+
             fetchRequests();
             fetchHistory();
         } catch (error) {
             console.error('Error processing barter request:', error);
         }
-    };    
+    };
 
     const renderRequests = ({ item }) => {
-        const isOwner = item.ownerId === auth.currentUser.uid;
-    
+        const isOwner = item.ownerId === auth.currentUser .uid;
+
         return (
-            <View style={styles.card}>
-                <Text style={styles.cardTitle}>
-                    {isOwner
-                        ? `Permintaan dari ${item.requesterName} (${item.requesterPhone})`
-                        : `Permintaan terkirim ke ${item.ownerName} (${item.ownerPhone})`}
-                </Text>
-                <Text style={styles.cardText}>Barang Anda: {item.ownerProductName}</Text>
-                <Text style={styles.cardText}>
-                    Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
-                </Text>
-                <Text style={styles.cardText}>Barang Ditawarkan: {item.requesterProductName}</Text>
-                <Text style={styles.cardText}>
-                    Jumlah Ditawarkan: {item.exchangeQty || 'Tidak tersedia'}
-                </Text>
-                <Text style={styles.cardText}>
-                    Tanggal: {new Date(item.timestamp.seconds * 1000).toLocaleString()}
-                </Text>
+            <View className="bg-gray-100 p-4 rounded-lg mb-2">
+                <View className="flex flex-row justify-between items-center">
+                    <View className="flex-1">
+                        <Text className="text-lg font-bold">
+                            {isOwner
+                                ? `Permintaan dari ${item.requesterName} (${item.requesterPhone})`
+                                : `Permintaan terkirim ke ${item.ownerName} (${item.ownerPhone})`}
+                        </Text>
+                        <Text className="text-gray-600">Barang Anda: {item.ownerProductName}</Text>
+                        <Text className="text-gray-600">
+                            Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
+                        </Text>
+                        <Text className="text-gray-600">Barang Ditawarkan: {item.requesterProductName}</Text>
+                        <Text className="text-gray-600">
+                            Jumlah Ditawarkan: {item.exchangeQty || 'Tidak tersedia'}
+                        </Text>
+                        <Text className="text-gray-600">
+                            Tanggal: {new Date(item.timestamp.seconds * 1000).toLocaleString()}
+                        </Text>
+                    </View>
+                    <View className="justify-center items-end">
+                        {item.ownerProductImage && (
+                            <Image
+                                source={{ uri: item.ownerProductImage }}
+                                className="w-12 h-12 rounded-lg mt-1"
+                            />
+                        )}
+                        {item.requesterProductImage && (
+                            <Image
+                                source={{ uri: item.requesterProductImage }}
+                                className="w-12 h-12 rounded-lg mt-1"
+                            />
+                        )}
+                    </View>
+                </View>
+
                 {isOwner ? (
-                    <View style={styles.buttonContainer}>
+                    <View className="flex flex-row mt-4 justify-between">
                         <TouchableOpacity
-                            style={styles.declineButton}
+                            className="bg-gray-200 py-2 px-4 rounded-lg"
                             onPress={() => handleResponse(item.id, false, item)}
                         >
-                            <Text style={styles.buttonText}>Tolak</Text>
+                            <Text className="font-bold text-gray-600">Tolak</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.acceptButton}
+                            className="bg-gray-700 py-2 px-4 rounded-lg"
                             onPress={() => handleResponse(item.id, true, item)}
                         >
-                            <Text style={[styles.buttonText, { color: 'white' }]}>Terima</Text>
+                            <Text className="font-bold text-white">Terima</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    <Text style={styles.statusText}>Permintaan telah dikirim</Text>
+                    <Text className="mt-2 text-gray-600 italic">Permintaan telah dikirim</Text>
                 )}
             </View>
         );
-    };    
-    
+    };
+
     const renderHistory = ({ item }) => (
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>
+        <View className="bg-gray-100 p-4 rounded-lg mb-2">
+            <Text className="text-lg font-bold">
                 Barter {item.status === 'accepted' ? 'Berhasil' : 'Ditolak'} dengan{' '}
-                {item.ownerId === auth.currentUser.uid ? item.requesterName : item.ownerName} (
-                {item.ownerId === auth.currentUser.uid ? item.requesterPhone : item.ownerPhone})
+                {item.ownerId === auth.currentUser .uid ? item.requesterName : item.ownerName} (
+                {item.ownerId === auth.currentUser .uid ? item.requesterPhone : item.ownerPhone})
             </Text>
-            <Text style={styles.cardText}>Barang Anda: {item.ownerProductName}</Text>
-            <Text style={styles.cardText}>
+            <Text className="text-gray-600">Barang Anda: {item.ownerProductName}</Text>
+            <Text className="text-gray-600">
                 Jumlah Barang Anda: {item.exchangeQty || 'Tidak tersedia'}
             </Text>
-            <Text style={styles.cardText}>Barang Barter: {item.requesterProductName}</Text>
-            <Text style={styles.cardText}>
+            <Text className="text-gray-600">Barang Barter: {item.requesterProductName}</Text>
+            <Text className="text-gray-600">
                 Jumlah Diminta: {item.requesterQuantity || 'Tidak tersedia'}
             </Text>
-            <Text style={styles.cardText}>
+            <Text className="text-gray-600">
                 Tanggal: {new Date(item.timestamp.seconds * 1000).toLocaleString()}
             </Text>
+
+            {item.ownerProductImage && (
+                <Image
+                    source={{ uri: item.ownerProductImage }}
+                    className="w-12 h-12 rounded-lg mt-1"
+                />
+ )}
+            {item.requesterProductImage && (
+                <Image
+                    source={{ uri: item.requesterProductImage }}
+                    className="w-12 h-12 rounded-lg mt-1"
+                />
+            )}
         </View>
-    );    
+    );
 
     return (
         <Modal
@@ -223,41 +255,32 @@ const RequestBarter = ({ visible, onClose }) => {
             onRequestClose={onClose}
         >
             <TouchableWithoutFeedback onPress={onClose}>
-                <View style={styles.overlay}>
+                <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
                     <TouchableWithoutFeedback>
-                        <View style={styles.container}>
-                            <View style={styles.tabContainer}>
+                        <View className="bg-white w-11/12 h-4/5 rounded-lg p-4">
+                            <View className="flex flex-row mb-4">
                                 <TouchableOpacity
-                                    style={[
-                                        styles.tabButton,
-                                        activeTab === 'requests' && styles.activeTab,
-                                    ]}
+                                    className={`flex-1 items-center py-2 border-b-2 ${activeTab === 'requests' ? 'border-gray-700' : 'border-transparent'}`}
                                     onPress={() => setActiveTab('requests')}
                                 >
-                                    <Text
-                                        style={[
-                                            styles.tabText,
-                                            activeTab === 'requests' && styles.activeTabText,
-                                        ]}
-                                    >
+                                    <Text className={`font-bold ${activeTab === 'requests' ? 'text-green-700' : 'text-green-900'}`}>
                                         Permintaan
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={[
-                                        styles.tabButton,
-                                        activeTab === 'history' && styles.activeTab,
-                                    ]}
+                                    className={`flex-1 items-center py-2 border-b-2 ${activeTab === 'history' ? 'border-gray-700' : 'border-transparent'}`}
                                     onPress={() => setActiveTab('history')}
                                 >
-                                    <Text
-                                        style={[
-                                            styles.tabText,
-                                            activeTab === 'history' && styles.activeTabText,
-                                        ]}
-                                    >
+                                    <Text className={`font-bold ${activeTab === 'history' ? 'text-green-700' : 'text-green-900'}`}>
                                         Riwayat
                                     </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    className="ml-2"
+                                    onPress={() => onClose()}
+                                >
+                                    <Text className="text-xl">×</Text>
                                 </TouchableOpacity>
                             </View>
                             <FlatList
@@ -267,7 +290,7 @@ const RequestBarter = ({ visible, onClose }) => {
                                 }
                                 keyExtractor={(item) => item.id}
                                 ListEmptyComponent={
-                                    <Text style={styles.emptyText}>
+                                    <Text className="text-center text-gray-600 mt-4">
                                         Belum ada{' '}
                                         {activeTab === 'requests' ? 'permintaan' : 'riwayat'} barter.
                                     </Text>
@@ -280,89 +303,5 @@ const RequestBarter = ({ visible, onClose }) => {
         </Modal>
     );
 };
-
-const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    container: {
-        backgroundColor: 'white',
-        width: '90%',
-        height: '80%',
-        borderRadius: 10,
-        padding: 16,
-    },
-    tabContainer: {
-        flexDirection: 'row',
-        marginBottom: 16,
-    },
-    tabButton: {
-        flex: 1,
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderBottomWidth: 2,
-        borderBottomColor: 'transparent',
-    },
-    activeTab: {
-        borderBottomColor: '#697565',
-    },
-    tabText: {
-        color: 'gray',
-        fontWeight: 'bold',
-    },
-    activeTabText: {
-        color: '#697565',
-    },
-    card: {
-        backgroundColor: '#f9f9f9',
-        padding: 16,
-        borderRadius: 8,
-        marginBottom: 8,
-    },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    cardText: {
-        fontSize: 14,
-        color: 'gray',
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        marginTop: 16,
-        justifyContent: 'space-between',
-    },
-    acceptButton: {
-        backgroundColor: '#697565',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-    },
-    declineButton: {
-        backgroundColor: '#f0f0f0',
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-    },
-    buttonText: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: 'gray',
-    },
-    statusText: {
-        marginTop: 10,
-        fontSize: 14,
-        color: 'gray',
-        fontStyle: 'italic',
-    },
-    emptyText: {
-        textAlign: 'center',
-        color: 'gray',
-        marginTop: 16,
-    },
-});
 
 export default RequestBarter;
