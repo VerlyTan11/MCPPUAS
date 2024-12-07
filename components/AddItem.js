@@ -14,7 +14,7 @@ const AddItem = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const [selectedImage, setSelectedImage] = useState(null);
-    const [isUploading, setIsUploading] = useState(false); // Untuk modal loading
+    const [isUploading, setIsUploading] = useState(false);
     const [formData, setFormData] = useState({
         alamat: '',
         berat: '',
@@ -69,7 +69,7 @@ const AddItem = () => {
 
     const handleImageUpload = async (uri) => {
         try {
-            setIsUploading(true); // Tampilkan modal loading
+            setIsUploading(true);
             const user = auth.currentUser;
             if (!user) {
                 Alert.alert('Error', 'User not authenticated');
@@ -125,15 +125,15 @@ const AddItem = () => {
         }
 
         try {
-            setIsUploading(true); // Tampilkan modal loading
+            setIsUploading(true);
             let imageUrl = '';
             if (selectedImage) {
-                imageUrl = await handleImageUpload(selectedImage); // Upload gambar ke Firebase Storage
+                imageUrl = await handleImageUpload(selectedImage);
             }
 
             const data = {
                 ...formData,
-                image_url: imageUrl, // Simpan URL dari Firebase Storage
+                image_url: imageUrl,
                 timestamp: new Date().toISOString(),
                 userId: user.uid,
             };
@@ -142,12 +142,12 @@ const AddItem = () => {
 
             dispatch(addItem({ id: docRef.id, ...data }));
 
-            setIsUploading(false); // Sembunyikan modal loading
+            setIsUploading(false);
             Alert.alert('Success', 'Product added successfully!');
             navigation.navigate('Home');
         } catch (error) {
             console.error('Error adding product:', error);
-            setIsUploading(false); // Sembunyikan modal loading
+            setIsUploading(false);
             Alert.alert('Error', 'Failed to add product');
         }
     };
