@@ -151,7 +151,7 @@ const Login = () => {
                 <TextInput
                     value={email}
                     onChangeText={setEmail}
-                    className="h-20 p-3 border-b border-gray-300 rounded mb-4"
+                    className="h-20 pl-0 border-b border-gray-300 rounded mb-4"
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
@@ -161,7 +161,7 @@ const Login = () => {
                     <TextInput
                         value={password}
                         onChangeText={setPassword}
-                        className="flex-1 h-20 p-3"
+                        className="flex-1 h-20 pl-0"
                         secureTextEntry={!isPasswordVisible}
                     />
                     <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>

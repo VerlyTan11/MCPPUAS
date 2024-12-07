@@ -57,53 +57,50 @@ const Register = () => {
                 </Text>
 
                 <View className="w-full">
-                    <Text className="text-gray-400">Name</Text>
+                    <Text className="text-gray-400 mb-2">Name</Text>
                     <TextInput
                         value={name}
                         onChangeText={setName}
-                        className="h-20 p-3 border-b border-gray-300 rounded mb-4"
+                        className="h-12 border-b border-gray-300 mb-4 pl-0"
                         autoCapitalize="none"
                     />
 
-                    <Text className="text-gray-400">Email</Text>
+                    <Text className="text-gray-400 mb-2">Email</Text>
                     <TextInput
                         value={email}
                         onChangeText={setEmail}
-                        className="h-20 p-3 border-b border-gray-300 rounded mb-4"
+                        className="h-12 border-b border-gray-300 mb-4 pl-0"
                         keyboardType="email-address"
                         autoCapitalize="none"
                     />
 
-                    <Text className="text-gray-400">Password</Text>
+                    <Text className="text-gray-400 mb-2">Password</Text>
                     <View className="flex-row items-center border-b border-gray-300 mb-4">
                         <TextInput
                             value={password}
                             onChangeText={setPassword}
-                            className="flex-1 h-20 p-3"
+                            className="flex-1 h-12 pl-0"
                             secureTextEntry={!isPasswordVisible}
                         />
                         <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
-                            <Text className="text-gray-500">
-                                {isPasswordVisible ? 'Hide' : 'Show'}
-                            </Text>
+                            <Text className="text-gray-500">{isPasswordVisible ? 'Hide' : 'Show'}</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <Text className="text-gray-400">Confirm Password</Text>
+                    <Text className="text-gray-400 mb-2">Confirm Password</Text>
                     <View className="flex-row items-center border-b border-gray-300 mb-4">
                         <TextInput
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
-                            className="flex-1 h-20 p-3"
+                            className="flex-1 h-12 pl-0"
                             secureTextEntry={!isConfirmPasswordVisible}
                         />
                         <TouchableOpacity onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}>
-                            <Text className="text-gray-500">
-                                {isConfirmPasswordVisible ? 'Hide' : 'Show'}
-                            </Text>
+                            <Text className="text-gray-500">{isConfirmPasswordVisible ? 'Hide' : 'Show'}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
+
 
                 <TouchableOpacity
                     onPress={handleRegister}
