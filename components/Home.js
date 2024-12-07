@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -9,6 +9,7 @@ import {
     KeyboardAvoidingView,
     Keyboard,
     TouchableWithoutFeedback,
+    Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import ItemsProp from './ItemsProp';
@@ -18,14 +19,17 @@ import { auth } from '../firebaseConfig';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSearchQuery } from '../redux/searchSlice';
 import { setCategory } from '../redux/categorySlice';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 const Home = ({ navigation }) => {
-    const currentUser  = auth.currentUser ;
+    const currentUser = auth.currentUser;
     const dispatch = useDispatch();
     const searchQuery = useSelector((state) => state.search.query);
     const selectedCategory = useSelector((state) => state.category.selected);
     const [triggeredSearchQuery, setTriggeredSearchQuery] = useState('');
     const inputRef = useRef(null);
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
 
     const categories = [
         { label: 'Kardus', value: 'kardus', icon: require('../assets/box.png') },
@@ -35,9 +39,38 @@ const Home = ({ navigation }) => {
         { label: 'More', value: 'more', icon: require('../assets/more.png') },
     ];
 
+    useEffect(() => {
+        if (currentUser) {
+            const fetchProfileImage = async () => {
+                try {
+                    console.log('Fetching profile image for user:', currentUser.uid);
+                    const userDocRef = doc(db, 'users', currentUser.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        console.log('User document data:', data);
+                        if (data.photo_url) {
+                            setProfileImageUrl(data.photo_url);
+                        } else {
+                            console.warn('photo_url not found in user document');
+                        }
+                    } else {
+                        console.error('No such document in Firestore');
+                    }
+                } catch (error) {
+                    console.error('Error fetching profile image:', error);
+                    Alert.alert('Error', 'Gagal memuat foto profil');
+                }
+            };
+            fetchProfileImage();
+        } else {
+            console.warn('No current user authenticated');
+        }
+    }, [currentUser]);
+
     const triggerSearch = () => {
         setTriggeredSearchQuery(searchQuery);
-        Keyboard.dismiss(); // Hanya tutup keyboard saat pencarian dipicu
+        Keyboard.dismiss();
     };
 
     const handleSearchChange = (text) => {
@@ -64,8 +97,8 @@ const Home = ({ navigation }) => {
                         value={searchQuery}
                         onChangeText={handleSearchChange}
                         returnKeyType="search"
-                        onSubmitEditing={triggerSearch} // Tutup keyboard saat tombol search ditekan
-                        blurOnSubmit={false} // Pastikan ini diatur ke false
+                        onSubmitEditing={triggerSearch}
+                        blurOnSubmit={false}
                     />
                     <TouchableOpacity onPress={triggerSearch}>
                         <Image
@@ -81,9 +114,13 @@ const Home = ({ navigation }) => {
                     className="ml-4 bg-gray-100 p-2 rounded-md"
                 >
                     <Image
-                        source={require('../assets/profile.png')}
-                        className="w-6 h-6"
-                        resizeMode="contain"
+                        source={
+                            profileImageUrl
+                                ? { uri: profileImageUrl }
+                                : require('../assets/profile.png')
+                        }
+                        style={{ width: 32, height: 32, borderRadius: 16 }}
+                        resizeMode="cover"
                     />
                 </TouchableOpacity>
             </View>
@@ -98,13 +135,13 @@ const Home = ({ navigation }) => {
                     overflow: 'hidden',
                 }}
             >
-                <View style={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)', 
-                    borderRadius: 16, 
-                    padding: 16, 
-                    flexDirection: 'row', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between' 
+                <View style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                    borderRadius: 16,
+                    padding: 16,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                 }}>
                     <View style={{ flex: 1, marginRight: 12 }}>
                         <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white', marginBottom: 4 }}>
@@ -184,7 +221,7 @@ const Home = ({ navigation }) => {
                         ListFooterComponent={
                             <View>
                                 <ItemsProp
-                                    excludeUser Id={currentUser ?.uid}
+                                    excludeUser Id={currentUser?.uid}
                                     filterCategory={selectedCategory}
                                     searchQuery={triggeredSearchQuery}
                                 />
@@ -201,4 +238,4 @@ const Home = ({ navigation }) => {
     );
 };
 
-export default Home; 
+export default Home;
