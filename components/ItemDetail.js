@@ -118,8 +118,13 @@ const ItemDetail = () => {
 
             <LinearGradient
                 colors={['#697565', '#ECDFCC']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1.2, y: 0 }}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1.2, y: 0 }}
+                    style={{
+                        borderRadius: 16,
+                        overflow: 'hidden',
+                        marginBottom: 16,
+                    }}
                 className="flex-row items-center justify-center p-4 rounded-lg shadow-md mb-8"
             >
                 <TouchableOpacity
@@ -147,6 +152,7 @@ const ItemDetail = () => {
                     </Text>
                 </TouchableOpacity>
             </LinearGradient>
+            <View style={{ marginBottom: 20 }} />
         </ScrollView>
     );
 };

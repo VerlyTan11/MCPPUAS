@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, TextInput, Alert, Modal } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, TextInput, Alert, Modal, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
-import { db } from '../firebaseConfig';
+import { db, storage } from '../firebaseConfig';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 const EditItem = () => {
     const navigation = useNavigation();
@@ -22,8 +23,10 @@ const EditItem = () => {
         kode_pos: '',
         image_url: '',
     });
+    const [originalProduct, setOriginalProduct] = useState({});
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         if (!itemId) {
@@ -38,7 +41,9 @@ const EditItem = () => {
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    setProduct(docSnap.data());
+                    const data = docSnap.data();
+                    setProduct(data);
+                    setOriginalProduct(data);
                 } else {
                     Alert.alert('Error', 'Product not found!');
                     navigation.goBack();
@@ -54,6 +59,10 @@ const EditItem = () => {
         fetchProduct();
     }, [itemId]);
 
+    const hasChanges = () => {
+        return JSON.stringify(product) !== JSON.stringify(originalProduct);
+    };
+
     const handleImagePicker = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -62,11 +71,51 @@ const EditItem = () => {
         });
 
         if (!result.canceled) {
-            setProduct({ ...product, image_url: result.assets[0].uri });
+            setIsUploading(true);
+            const uploadedUrl = await handleImageUpload(result.assets[0].uri);
+            if (uploadedUrl) {
+                setProduct({ ...product, image_url: uploadedUrl });
+            }
+            setIsUploading(false);
+        }
+    };
+
+    const handleImageUpload = async (uri) => {
+        try {
+            const fileRef = ref(storage, `item_images/${itemId}-${Date.now()}`);
+            const response = await fetch(uri);
+            const blob = await response.blob();
+
+            const uploadTask = uploadBytesResumable(fileRef, blob);
+
+            return new Promise((resolve, reject) => {
+                uploadTask.on(
+                    'state_changed',
+                    null,
+                    (error) => {
+                        console.error('Upload failed:', error.message);
+                        Alert.alert('Error', `Upload failed: ${error.message}`);
+                        reject(error);
+                    },
+                    async () => {
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        resolve(downloadURL);
+                    }
+                );
+            });
+        } catch (error) {
+            console.error('Error during image upload:', error.message);
+            Alert.alert('Error', `Failed to upload image: ${error.message}`);
+            return null;
         }
     };
 
     const handleUpdateProduct = async () => {
+        if (!hasChanges()) {
+            navigation.goBack();
+            return;
+        }
+
         try {
             if (!product.nama_product.trim()) {
                 Alert.alert('Error', 'Nama produk tidak boleh kosong');
@@ -78,6 +127,7 @@ const EditItem = () => {
                 timestamp: new Date().toISOString(),
             });
             Alert.alert('Success', 'Product updated successfully');
+            setOriginalProduct(product);
             navigation.goBack();
         } catch (error) {
             console.error('Error updating product:', error);
@@ -92,7 +142,7 @@ const EditItem = () => {
             Alert.alert('Success', 'Product deleted successfully', [
                 {
                     text: 'OK',
-                    onPress: () => navigation.navigate('Profile'), // Navigasi ke halaman Profile setelah delete
+                    onPress: () => navigation.navigate('Profile'),
                 },
             ]);
         } catch (error) {
@@ -103,109 +153,104 @@ const EditItem = () => {
 
     if (loading) {
         return (
-            <View className="flex-1 justify-center items-center">
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Text>Loading...</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView className="flex-1 bg-white p-8">
-            <View className="flex-row items-center justify-between mb-4">
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
-                </TouchableOpacity>
+        <>
+            <ScrollView style={{ flex: 1, backgroundColor: 'white', padding: 16 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Image source={require('../assets/back.png')} style={{ width: 40, height: 40 }} />
+                    </TouchableOpacity>
 
-                <TouchableOpacity 
-                    onPress={() => setModalVisible(true)}
-                    className="bg-gray-200 rounded-full p-1"
-                    style={{ width: 32, height: 32, justifyContent: 'center', alignItems: 'center' }}
-                >
-                    <Image 
-                        source={require('../assets/delete-black.png')}
-                        className="w-6 h-6"
-                    />
-                </TouchableOpacity>
-            </View>
+                    <TouchableOpacity
+                        onPress={() => setModalVisible(true)}
+                        style={{
+                            backgroundColor: '#f5f5f5',
+                            borderRadius: 50,
+                            padding: 8,
+                        }}
+                    >
+                        <Image source={require('../assets/delete-black.png')} style={{ width: 24, height: 24 }} />
+                    </TouchableOpacity>
+                </View>
 
-            <View className="relative">
                 <TouchableOpacity onPress={handleImagePicker}>
-                    <Image 
+                    <Image
                         source={product.image_url ? { uri: product.image_url } : require('../assets/kardus.jpg')}
-                        className="w-full h-64 rounded-lg mb-4"
+                        style={{
+                            width: '100%',
+                            height: 200,
+                            borderRadius: 10,
+                            marginBottom: 16,
+                        }}
                         resizeMode="cover"
                     />
                 </TouchableOpacity>
-            </View>
 
-            {[
-                { label: 'Nama Produk', value: 'nama_product', placeholder: 'Nama Produk' },
-                { label: 'Jenis Produk', value: 'jenis', placeholder: 'Jenis Produk' },
-                { label: 'Jumlah', value: 'jumlah', placeholder: 'Jumlah' },
-                { label: 'Berat / pcs', value: 'berat', placeholder: 'Berat / pcs' },
-                { label: 'Catatan', value: 'catatan', placeholder: 'Catatan' },
-                { label: 'Alamat Lengkap', value: 'alamat', placeholder: 'Alamat Lengkap' },
-                { label: 'No. Rumah', value: 'no_rumah', placeholder: 'No. Rumah' },
-                { label: 'Kode Pos', value: 'kode_pos', placeholder: 'Kode Pos' },
-            ].map((field, index) => (
-                <View className="mb-4" key={index}>
-                    <Text className="text-gray-600 mb-2">{field.label}</Text>
-                    <TextInput
-                        value={product[field.value]}
-                        onChangeText={(text) => setProduct({ ...product, [field.value]: text })}
-                        placeholder={field.placeholder}
-                        className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3"
-                    />
-                </View>
-            ))}
-
-            <LinearGradient 
-                colors={['#697565', '#ECDFCC']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1.2, y: 0 }}
-                className="flex-row items-center justify-center p-4 rounded-lg mb-6"
-            >
-                <TouchableOpacity
-                    className="flex-1 items-center justify-center"
-                    onPress={handleUpdateProduct}
-                >
-                    <Text className="text-center text-white font-semibold">Update</Text>
-                </TouchableOpacity>
-            </LinearGradient>
-
-            <View style={{ marginBottom: 20 }}></View>
-
-            <Modal
-                transparent={true}
-                visible={modalVisible}
-                animationType="slide"
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-                    <View className="bg-white p-6 rounded-lg w-3/4">
-                        <Text className="text-lg font-semibold text-center mb-4">Hapus Produk</Text>
-                        <Text className="text-gray-700 text-center mb-6">Apakah Anda yakin ingin menghapus produk ini?</Text>
-                        <View className="flex-row justify-around">
-                            <TouchableOpacity
-                                onPress={() => setModalVisible(false)}
-                                className="px-6 py-2 rounded-lg bg-gray-200"
-                            >
-                                <Text className="text-gray-700">Batal</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => {
-                                    setModalVisible(false);
-                                    handleDeleteProduct();
-                                }}
-                                className="px-6 py-2 rounded-lg bg-red-500"
-                            >
-                                <Text className="text-white">Hapus</Text>
-                            </TouchableOpacity>
-                        </View>
+                {[
+                    { label: 'Nama Produk', value: 'nama_product', placeholder: 'Nama Produk' },
+                    { label: 'Jenis Produk', value: 'jenis', placeholder: 'Jenis Produk' },
+                    { label: 'Jumlah', value: 'jumlah', placeholder: 'Jumlah' },
+                    { label: 'Berat / pcs', value: 'berat', placeholder: 'Berat / pcs' },
+                    { label: 'Catatan', value: 'catatan', placeholder: 'Catatan' },
+                    { label: 'Alamat Lengkap', value: 'alamat', placeholder: 'Alamat Lengkap' },
+                    { label: 'No. Rumah', value: 'no_rumah', placeholder: 'No. Rumah' },
+                    { label: 'Kode Pos', value: 'kode_pos', placeholder: 'Kode Pos' },
+                ].map((field, index) => (
+                    <View key={index} style={{ marginBottom: 16 }}>
+                        <Text style={{ marginBottom: 8, color: '#555' }}>{field.label}</Text>
+                        <TextInput
+                            value={product[field.value]}
+                            onChangeText={(text) => setProduct({ ...product, [field.value]: text })}
+                            placeholder={field.placeholder}
+                            style={{
+                                backgroundColor: '#f5f5f5',
+                                padding: 12,
+                                borderRadius: 8,
+                                color: '#333',
+                            }}
+                        />
                     </View>
+                ))}
+
+                <LinearGradient
+                    colors={['#697565', '#ECDFCC']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1.2, y: 0 }}
+                    style={{
+                        borderRadius: 16,
+                        overflow: 'hidden',
+                        marginBottom: 16,
+                    }}
+                >
+                    <TouchableOpacity onPress={handleUpdateProduct} style={{ paddingVertical: 16 }}>
+                        <Text style={{ textAlign: 'center', color: '#fff', fontWeight: 'bold' }}>
+                            {hasChanges() ? 'Simpan' : 'Cancel'}
+                        </Text>
+                    </TouchableOpacity>
+                </LinearGradient>
+                <View style={{ marginBottom: 20 }} />
+            </ScrollView>
+
+            <Modal transparent={true} visible={isUploading} animationType="fade">
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                    }}
+                >
+                    <ActivityIndicator size="large" color="#ffffff" />
+                    <Text style={{ marginTop: 16, color: '#ffffff', fontSize: 16 }}>Uploading...</Text>
                 </View>
             </Modal>
-        </ScrollView>
+        </>
     );
 };
 
