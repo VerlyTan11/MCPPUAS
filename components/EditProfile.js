@@ -10,12 +10,12 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 const EditProfile = () => {
   const navigation = useNavigation();
   const [profileImage, setProfileImage] = useState(null);
-  const [loadingImage, setLoadingImage] = useState(false); // State untuk loading indikator
+  const [loadingImage, setLoadingImage] = useState(false);
   const [name, setName] = useState('');
   const [telp, setTelp] = useState('');
   const [email, setEmail] = useState('');
-  const [isEditing, setIsEditing] = useState(false); // Untuk kontrol tombol Simpan/Edit
-  const [originalData, setOriginalData] = useState({}); // Menyimpan data asli untuk perbandingan
+  const [isEditing, setIsEditing] = useState(false);
+  const [originalData, setOriginalData] = useState({});
 
   useEffect(() => {
     fetchUserData();
@@ -34,7 +34,7 @@ const EditProfile = () => {
 
       if (userDoc.exists()) {
         const data = userDoc.data();
-        console.log('Fetched user data:', data); // Debug data yang diambil dari Firestore
+        console.log('Fetched user data:', data);
         setName(data.name || '');
         setTelp(data.telp || '');
         setEmail(data.email || '');
@@ -43,7 +43,7 @@ const EditProfile = () => {
           name: data.name || '',
           telp: data.telp || '',
           photo_url: data.photo_url || '',
-        }); // Simpan data asli untuk perbandingan
+        });
       } else {
         Alert.alert('Error', 'User data not found in Firestore');
       }
@@ -98,11 +98,11 @@ const EditProfile = () => {
 
   const handleImageUpload = async (uri) => {
     try {
-      setLoadingImage(true); // Tampilkan loading saat upload
+      setLoadingImage(true);
       const user = auth.currentUser;
       if (!user) {
         Alert.alert('Error', 'User not authenticated');
-        setLoadingImage(false); // Matikan loading jika gagal
+        setLoadingImage(false);
         return;
       }
 
@@ -116,22 +116,22 @@ const EditProfile = () => {
         'state_changed',
         null,
         (error) => {
-          console.error('Upload failed:', error.message); // Log error jika gagal upload
+          console.error('Upload failed:', error.message);
           Alert.alert('Error', `Upload failed: ${error.message}`);
-          setLoadingImage(false); // Matikan loading jika gagal
+          setLoadingImage(false);
         },
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          console.log('Download URL:', downloadURL); // Debugging untuk memastikan URL berhasil diambil
-          setProfileImage(downloadURL); // Simpan URL gambar ke state
-          setIsEditing(true); // Ubah tombol menjadi "Simpan"
-          setLoadingImage(false); // Matikan loading setelah upload selesai
+          console.log('Download URL:', downloadURL);
+          setProfileImage(downloadURL);
+          setIsEditing(true);
+          setLoadingImage(false);
         }
       );
     } catch (error) {
       console.error('Error during image upload:', error.message);
       Alert.alert('Error', `Gagal mengunggah gambar: ${error.message}`);
-      setLoadingImage(false); // Matikan loading jika gagal
+      setLoadingImage(false);
     }
   };
 
@@ -145,7 +145,6 @@ const EditProfile = () => {
 
   const handleSaveProfile = async () => {
     if (!hasChanges()) {
-      // Jika tidak ada perubahan, kembali ke halaman sebelumnya tanpa alert
       navigation.navigate('Profile');
       return;
     }
@@ -172,12 +171,12 @@ const EditProfile = () => {
       });
 
       Alert.alert('Berhasil', 'Profil berhasil diperbarui');
-      setIsEditing(false); // Kembali ke mode "Edit"
+      setIsEditing(false);
       setOriginalData({
         name: name,
         telp: telp,
         photo_url: profileImage || '',
-      }); // Perbarui data asli setelah perubahan disimpan
+      });
       navigation.navigate('Profile');
     } catch (error) {
       console.error('Error saving profile:', error.message);
@@ -190,17 +189,17 @@ const EditProfile = () => {
       <View className="flex-row items-center mb-4">
         <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
           <TouchableOpacity onPress={handleImagePicker}>
-            {loadingImage ? ( // Tampilkan indikator loading saat gambar sedang dimuat
+            {loadingImage ? (
               <ActivityIndicator size="large" color="#697565" />
             ) : profileImage ? (
               <Image 
-                source={{ uri: profileImage }} // Tampilkan foto profil jika ada
+                source={{ uri: profileImage }}
                 className="w-32 h-32 rounded-lg"
                 resizeMode="cover"
               />
             ) : (
               <Image 
-                source={require('../assets/plus.png')} // Ikon default jika belum ada foto
+                source={require('../assets/plus.png')}
                 className="w-6 h-6"
                 resizeMode="contain"
               />
@@ -212,7 +211,7 @@ const EditProfile = () => {
           value={name}
           onChangeText={(text) => {
             setName(text);
-            setIsEditing(true); // Ubah tombol menjadi "Simpan"
+            setIsEditing(true);
           }}
           className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-2"
         />
@@ -223,7 +222,7 @@ const EditProfile = () => {
         value={telp}
         onChangeText={(text) => {
           setTelp(text);
-          setIsEditing(true); // Ubah tombol menjadi "Simpan"
+          setIsEditing(true);
         }}
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
       />
@@ -233,7 +232,7 @@ const EditProfile = () => {
         value={email}
         onChangeText={(text) => {
           setEmail(text);
-          setIsEditing(true); // Ubah tombol menjadi "Simpan"
+          setIsEditing(true);
         }}
         editable={false}
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
