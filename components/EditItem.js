@@ -177,6 +177,67 @@ const EditItem = () => {
                     >
                         <Image source={require('../assets/delete-black.png')} style={{ width: 24, height: 24 }} />
                     </TouchableOpacity>
+
+                    <Modal
+                        transparent={true}
+                        visible={modalVisible}
+                        animationType="fade"
+                        onRequestClose={() => setModalVisible(false)}
+                    >
+                        <View
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                backgroundColor: 'rgba(0,0,0,0.5)',
+                            }}
+                        >
+                            <View
+                                style={{
+                                    backgroundColor: 'white',
+                                    padding: 20,
+                                    borderRadius: 10,
+                                    width: '80%',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 20 }}>
+                                    Apakah Anda yakin ingin menghapus barang ini?
+                                </Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                                    <TouchableOpacity
+                                        onPress={() => setModalVisible(false)}
+                                        style={{
+                                            flex: 1,
+                                            marginHorizontal: 5,
+                                            backgroundColor: '#f5f5f5',
+                                            paddingVertical: 10,
+                                            borderRadius: 8,
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Text style={{ fontWeight: 'bold', color: '#333' }}>Tidak</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setModalVisible(false);
+                                            handleDeleteProduct();
+                                        }}
+                                        style={{
+                                            flex: 1,
+                                            marginHorizontal: 5,
+                                            backgroundColor: '#f44336',
+                                            paddingVertical: 10,
+                                            borderRadius: 8,
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Text style={{ fontWeight: 'bold', color: '#fff' }}>Ya</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
 
                 <TouchableOpacity onPress={handleImagePicker}>
