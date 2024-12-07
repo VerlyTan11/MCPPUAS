@@ -28,10 +28,10 @@ const Home = ({ navigation }) => {
     const inputRef = useRef(null);
 
     const categories = [
-        { label: 'Kardus', value: 'box', icon: require('../assets/box.png') },
-        { label: 'Kain', value: 'fabric', icon: require('../assets/hanger.png') },
-        { label: 'Kamera', value: 'camera', icon: require('../assets/cam.png') },
-        { label: 'Buku', value: 'book', icon: require('../assets/book.png') },
+        { label: 'Kardus', value: 'kardus', icon: require('../assets/box.png') },
+        { label: 'Kain', value: 'kain', icon: require('../assets/hanger.png') },
+        { label: 'Kamera', value: 'kamera', icon: require('../assets/cam.png') },
+        { label: 'Buku', value: 'buku', icon: require('../assets/book.png') },
         { label: 'More', value: 'more', icon: require('../assets/more.png') },
     ];
 
