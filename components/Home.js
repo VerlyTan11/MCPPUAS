@@ -199,7 +199,7 @@ const Home = ({ navigation }) => {
                     </View>
                 ))}
             </View>
-            <Text className="text-xl font-bold text-black mb-4">Koleksi Kami</Text>
+            <Text className="text-xl font-bold text-black mb-4">Beranda</Text>
         </View>
     );
 

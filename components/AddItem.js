@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -9,12 +9,14 @@ import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../redux/itemsSlice';
+import Modal from 'react-native-modal';
 
 const AddItem = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const [selectedImage, setSelectedImage] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
     const [formData, setFormData] = useState({
         alamat: '',
         berat: '',
@@ -95,7 +97,6 @@ const AddItem = () => {
                     },
                     async () => {
                         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        console.log('Download URL:', downloadURL);
                         resolve(downloadURL);
                     }
                 );
@@ -143,8 +144,15 @@ const AddItem = () => {
             dispatch(addItem({ id: docRef.id, ...data }));
 
             setIsUploading(false);
-            Alert.alert('Success', 'Product added successfully!');
-            navigation.navigate('Home');
+
+            // Tampilkan modal sukses
+            setIsSuccessModalVisible(true);
+
+            // Tutup modal dan pindah ke halaman lain setelah delay
+            setTimeout(() => {
+                setIsSuccessModalVisible(false);
+                navigation.navigate('Home');
+            }, 2000);
         } catch (error) {
             console.error('Error adding product:', error);
             setIsUploading(false);
@@ -186,11 +194,7 @@ const AddItem = () => {
                         selectedValue={formData.jenis}
                         onValueChange={(value) => handleInputChange('jenis', value)}
                     >
-                        <Picker.Item 
-                            label="Pilih Jenis Produk" 
-                            value="" 
-                            color="#888"
-                        />
+                        <Picker.Item label="Pilih Jenis Produk" value="" color="#888" />
                         <Picker.Item label="Kardus" value="kardus" />
                         <Picker.Item label="Kain" value="kain" />
                         <Picker.Item label="Kamera" value="kamera" />
@@ -266,22 +270,32 @@ const AddItem = () => {
                 </LinearGradient>
             </ScrollView>
 
-            <Modal
-                transparent={true}
-                animationType="fade"
-                visible={isUploading}
-                onRequestClose={() => {}}
-            >
+            <Modal isVisible={isUploading} style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <View
                     style={{
-                        flex: 1,
-                        justifyContent: 'center',
+                        backgroundColor: 'white',
+                        padding: 20,
+                        borderRadius: 10,
                         alignItems: 'center',
-                        backgroundColor: 'rgba(0,0,0,0.5)',
                     }}
                 >
-                    <ActivityIndicator size="large" color="#ffffff" />
-                    <Text style={{ marginTop: 16, color: '#ffffff', fontSize: 16 }}>Uploading...</Text>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                    <Text style={{ marginTop: 15, fontWeight: '600' }}>
+                        Sedang Mengunggah Item
+                    </Text>
+                </View>
+            </Modal>
+
+            <Modal isVisible={isSuccessModalVisible} style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <View
+                    style={{
+                        backgroundColor: 'white',
+                        padding: 20,
+                        borderRadius: 10,
+                        alignItems: 'center',
+                    }}
+                >
+                    <Text style={{ color: 'green' }}>Produk berhasil ditambahkan!</Text>
                 </View>
             </Modal>
         </>
