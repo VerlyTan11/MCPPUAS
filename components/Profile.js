@@ -5,6 +5,7 @@ import { db, auth } from '../firebaseConfig';
 import { doc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import RequestBarter from './RequestBarter';
+import FloatingAddButton from './FloatingAddButton';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -202,6 +203,7 @@ const Profile = () => {
       </Modal>
 
       <RequestBarter visible={barterModalVisible} onClose={() => setBarterModalVisible(false)} />
+      <FloatingAddButton onPress={() => navigation.navigate('AddItem')} />
     </SafeAreaProvider>
   );
 };

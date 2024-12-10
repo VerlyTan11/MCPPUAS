@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'; 
-import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert, Modal } from 'react-native';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebaseConfig';
@@ -12,6 +12,7 @@ const ItemDetail = () => {
     const { itemId } = route.params || {};
     const [product, setProduct] = useState(null);
     const [owner, setOwner] = useState(null);
+    const [noItemsModalVisible, setNoItemsModalVisible] = useState(false);
 
     const fetchProductDetails = async () => {
         try {
@@ -47,6 +48,29 @@ const ItemDetail = () => {
         }
     };
 
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
+
+    const handleBarterPress = () => {
+        if (!auth.currentUser?.phoneNumber) {
+            setNoItemsModalVisible(true);
+        } else {
+            const isUserOwner = auth.currentUser?.uid === product.userId;
+            if (isUserOwner) {
+                navigation.navigate('EditItem', { itemId: product.id });
+            } else {
+                navigation.navigate('PilihItem', {
+                    ownerProductId: product.id,
+                    ownerId: product.userId,
+                    ownerLocation: product.alamat || 'Lokasi tidak tersedia',
+                    ownerProductName: product.nama_product,
+                    ownerProductImage: product.image_url || null,
+                });
+            }
+        }
+    };
+
     useEffect(() => {
         if (isFocused) {
             fetchProductDetails();
@@ -61,15 +85,15 @@ const ItemDetail = () => {
         );
     }
 
-    const isUserOwner = auth.currentUser?.uid === product.userId;
-
     return (
         <ScrollView className="flex-1 bg-gray-100 p-4">
-            <View className="flex-row items-center mb-4">
-                <TouchableOpacity onPress={() => navigation.goBack()} className="p-2 bg-gray-200 rounded-full">
-                    <Image source={require('../assets/back.png')} className="w-8 h-8" />
+            <View className="flex-row mb-8 items-center">
+                <TouchableOpacity onPress={handleBackPress}>
+                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
                 </TouchableOpacity>
-                <Text className="ml-4 text-lg font-semibold text-gray-800">Detail Produk</Text>
+                <View className="flex-1 justify-center mr-10">
+                    <Text className="text-xl font-semibold text-center">Posting Item</Text>
+                </View>
             </View>
 
             <View className="bg-white rounded-lg shadow-md mb-4 overflow-hidden">
@@ -94,7 +118,17 @@ const ItemDetail = () => {
             <View className="bg-white p-4 rounded-lg shadow-md mb-4">
                 <Text className="text-xl font-bold text-gray-800 mb-2">{product.nama_product}</Text>
                 <Text className="text-gray-500 text-sm mb-4">
-                    {new Date(product.timestamp).toLocaleString() || 'Unknown time'}
+                    {new Date(product.timestamp).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                    }) 
+                    ? `Diposting tanggal ${new Date(product.timestamp).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                    })}` 
+                    : 'Unknown time'}
                 </Text>
 
                 <View className="flex-row flex-wrap mb-4">
@@ -118,13 +152,13 @@ const ItemDetail = () => {
 
             <LinearGradient
                 colors={['#697565', '#ECDFCC']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1.2, y: 0 }}
-                    style={{
-                        borderRadius: 16,
-                        overflow: 'hidden',
-                        marginBottom: 16,
-                    }}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1.2, y: 0 }}
+                style={{
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    marginBottom: 16,
+                }}
                 className="flex-row items-center justify-center p-4 rounded-lg shadow-md mb-8"
             >
                 <TouchableOpacity
@@ -133,25 +167,39 @@ const ItemDetail = () => {
                         borderRadius: 16,
                         overflow: 'hidden',
                     }}
-                    onPress={() => {
-                        if (isUserOwner) {
-                            navigation.navigate('EditItem', { itemId: product.id });
-                        } else {
-                            navigation.navigate('PilihItem', {
-                                ownerProductId: product.id,
-                                ownerId: product.userId,
-                                ownerLocation: product.alamat || 'Lokasi tidak tersedia',
-                                ownerProductName: product.nama_product,
-                                ownerProductImage: product.image_url || null,
-                            });
-                        }
-                    }}
+                    onPress={handleBarterPress}
                 >
                     <Text className="text-center text-white font-semibold">
-                        {isUserOwner ? 'Edit' : 'Barter'}
+                        {auth.currentUser?.uid === product.userId ? 'Edit' : 'Barter'}
                     </Text>
                 </TouchableOpacity>
             </LinearGradient>
+
+            {/* Modal for missing phone number */}
+            <Modal
+                visible={noItemsModalVisible}
+                animationType="fade"
+                transparent
+                onRequestClose={() => setNoItemsModalVisible(false)}
+            >
+                <View className="flex-1 justify-center items-center bg-gray-400 opacity-80">
+                    <View className="w-4/5 bg-white rounded-xl p-6 items-center shadow-lg">
+                        <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                            Tidak bisa barter jika belum memasukkan nomor telepon.
+                        </Text>
+                        <TouchableOpacity
+                            className="bg-[#4A4A4A] rounded-lg py-2 px-4"
+                            onPress={() => {
+                                setNoItemsModalVisible(false);
+                                navigation.navigate('EditProfile');
+                            }}
+                        >
+                            <Text className="text-white font-semibold">Masukkan Nomor Telepon</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
             <View style={{ marginBottom: 20 }} />
         </ScrollView>
     );

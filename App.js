@@ -38,23 +38,17 @@ export default function App() {
               <Stack.Screen name="Register" component={Register} options={{ headerShown: false }} />
               <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
               <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-              <Stack.Screen name="EditProfile" component={EditProfile} options={{ 
-                  title: "Edit Profile",
-                  headerTitleAlign: 'center'
-                }} />
+              <Stack.Screen name="EditProfile" component={EditProfile} options={{ headerShown: false }} />
               <Stack.Screen name="EditItem" component={EditItem} options={{ headerShown: false }} />
               <Stack.Screen name="PageEdit" component={PageEdit} options={{ title: "Edit Item's", headerTitleAlign: 'center' }} />
               <Stack.Screen 
                 name="AddItem" 
                 component={AddItem} 
-                options={{ 
-                  title: "Posting Item's",
-                  headerTitleAlign: 'center'
-                }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen name="ItemDetail" component={ItemDetail} options={{ headerShown: false }} />
               <Stack.Screen name="Barter" component={Barter} options={{ headerTitleAlign: 'center' }}/>
-              <Stack.Screen name="PilihItem" component={PilihItem} options={{ headerTitleAlign: 'center' }}/>
+              <Stack.Screen name="PilihItem" component={PilihItem} options={{ headerShown: false }}/>
               <Stack.Screen name="ChatStart" component={ChatStart} options={{ headerShown: false }}/>
               <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }}/>
             </Stack.Navigator>

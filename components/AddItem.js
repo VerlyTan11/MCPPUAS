@@ -160,9 +160,21 @@ const AddItem = () => {
         }
     };
 
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
+
     return (
         <>
-            <ScrollView style={{ flex: 1, padding: 24, backgroundColor: 'white' }}>
+            <ScrollView className="bg-white p-4">
+                <View className="flex-row mb-8 items-center">
+                    <TouchableOpacity onPress={handleBackPress}>
+                        <Image source={require('../assets/back.png')} className="w-10 h-10" />
+                    </TouchableOpacity>
+                    <View className="flex-1 justify-center mr-10">
+                        <Text className="text-xl font-semibold text-center">Posting Item</Text>
+                    </View>
+                </View>
                 <View className="flex-row items-center mb-4">
                     <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
                         <TouchableOpacity onPress={handleImagePicker}>
@@ -182,10 +194,10 @@ const AddItem = () => {
                         </TouchableOpacity>
                     </View>
                     <TextInput 
-                        placeholder="Masukkan Nama Produk" 
+                        placeholder="Masukkan Nama Produk"
                         value={formData.nama_product}
                         onChangeText={(value) => handleInputChange('nama_product', value)}
-                        className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-2"
+                        className="flex-1 bg-gray-100 text-gray-600 rounded-lg text-center"
                     />
                 </View>
 
@@ -194,12 +206,12 @@ const AddItem = () => {
                         selectedValue={formData.jenis}
                         onValueChange={(value) => handleInputChange('jenis', value)}
                     >
-                        <Picker.Item label="Pilih Jenis Produk" value="" color="#888" />
-                        <Picker.Item label="Kardus" value="kardus" />
-                        <Picker.Item label="Kain" value="kain" />
-                        <Picker.Item label="Kamera" value="kamera" />
-                        <Picker.Item label="Buku" value="buku" />
-                        <Picker.Item label="More" value="more" />
+                        <Picker.Item label="Pilih Jenis Produk" value="" color="#888" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Kardus" value="kardus" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Kain" value="kain" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Kamera" value="kamera" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Buku" value="buku" style={{ fontSize: 14 }} />
+                        <Picker.Item label="More" value="more" style={{ fontSize: 14 }} />
                     </Picker>
                 </View>
 
@@ -231,7 +243,7 @@ const AddItem = () => {
                     onChangeText={(value) => handleInputChange('alamat', value)}
                     className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
                 />
-                <View className="flex-row mb-8">
+                <View className="flex-row mb-12">
                     <TextInput 
                         placeholder="No. Rumah" 
                         value={formData.no_rumah}
@@ -256,13 +268,7 @@ const AddItem = () => {
                         overflow: 'hidden',
                     }}
                 >
-                    <TouchableOpacity
-                        style={{
-                            width: '100%',
-                            paddingVertical: 16,
-                            alignItems: 'center',
-                            borderRadius: 16, 
-                        }}
+                    <TouchableOpacity className="w-full py-4 items-center"
                         onPress={handlePost}
                     >
                         <Text className="text-white font-semibold">Posting</Text>
@@ -270,14 +276,8 @@ const AddItem = () => {
                 </LinearGradient>
             </ScrollView>
 
-            <Modal isVisible={isUploading} style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <View
-                    style={{
-                        backgroundColor: 'white',
-                        padding: 20,
-                        borderRadius: 10,
-                        alignItems: 'center',
-                    }}
+            <Modal isVisible={isUploading} className="justify-center items-center">
+                <View className="bg-white p-4 rounded-sm items-center"
                 >
                     <ActivityIndicator size="large" color="#0000ff" />
                     <Text style={{ marginTop: 15, fontWeight: '600' }}>
@@ -286,14 +286,8 @@ const AddItem = () => {
                 </View>
             </Modal>
 
-            <Modal isVisible={isSuccessModalVisible} style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <View
-                    style={{
-                        backgroundColor: 'white',
-                        padding: 20,
-                        borderRadius: 10,
-                        alignItems: 'center',
-                    }}
+            <Modal isVisible={isSuccessModalVisible} className="justify-center items-center">
+                <View className="bg-white p-4 rounded-sm items-center"
                 >
                     <Text style={{ color: 'green' }}>Produk berhasil ditambahkan!</Text>
                 </View>

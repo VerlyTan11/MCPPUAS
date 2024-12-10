@@ -14,6 +14,7 @@ const PilihItem = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [inputQty, setInputQty] = useState('');
     const [exchangeQty, setExchangeQty] = useState('');
+    const [noItemsModalVisible, setNoItemsModalVisible] = useState(false);
 
     useEffect(() => {
         const fetchUserProducts = async () => {
@@ -29,6 +30,11 @@ const PilihItem = () => {
                     ...doc.data(),
                 }));
                 setUserProducts(products);
+
+                // Jika tidak ada produk, tampilkan modal
+                if (products.length === 0) {
+                    setNoItemsModalVisible(true);
+                }
             } catch (error) {
                 console.error('Error fetching user products:', error);
             }
@@ -82,27 +88,48 @@ const PilihItem = () => {
         });
     };
 
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
+
+    const handleAddItemNavigation = () => {
+        navigation.navigate('AddItem');
+        setNoItemsModalVisible(false);
+    };
+
     return (
         <View className="flex-1 bg-white p-4">
+            <View className="flex-row mb-8 items-center">
+                <TouchableOpacity onPress={handleBackPress}>
+                    <Image source={require('../assets/back.png')} className="w-10 h-10" />
+                </TouchableOpacity>
+                <View className="flex-1 justify-center mr-10">
+                    <Text className="text-xl font-semibold text-center">Pilih Item</Text>
+                </View>
+            </View>
             <View className="flex-row flex-wrap justify-around">
-                {userProducts.map((product) => (
-                    <TouchableOpacity
-                        key={product.id}
-                        className="items-center mb-6"
-                        onPress={() => handleSelectProduct(product)}
-                    >
-                        <Image
-                            source={
-                                product.image_url
-                                    ? { uri: product.image_url }
-                                    : require('../assets/kardus.jpg')
-                            }
-                            className="w-24 h-24 rounded-lg mb-2"
-                        />
-                        <Text className="text-gray-800">{product.nama_product}</Text>
-                        <Text className="text-gray-500">Stok: {product.jumlah}</Text>
-                    </TouchableOpacity>
-                ))}
+                {userProducts.length > 0 ? (
+                    userProducts.map((product) => (
+                        <TouchableOpacity
+                            key={product.id}
+                            className="items-center mb-6"
+                            onPress={() => handleSelectProduct(product)}
+                        >
+                            <Image
+                                source={
+                                    product.image_url
+                                        ? { uri: product.image_url }
+                                        : require('../assets/kardus.jpg')
+                                }
+                                className="w-24 h-24 rounded-lg mb-2"
+                            />
+                            <Text className="text-gray-800">{product.nama_product}</Text>
+                            <Text className="text-gray-500">Stok: {product.jumlah}</Text>
+                        </TouchableOpacity>
+                    ))
+                ) : (
+                    <Text className="text-center text-gray-500 mb-6">Tidak ada item yang diposting.</Text>
+                )}
             </View>
 
             <Modal
@@ -130,25 +157,46 @@ const PilihItem = () => {
                         />
                         <View className="flex-row justify-between w-full">
                             <TouchableOpacity
-                                className="flex-1 bg-gray-300 py-3 rounded-lg mx-2"
+                                className="flex-1 bg-gray-300 py-3"
                                 onPress={() => setModalVisible(false)}
                             >
                                 <Text className="text-center text-gray-700 font-semibold">Cancel</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                className="flex-1 mx-2"
-                                onPress={handleSubmit}
+                            <LinearGradient
+                                colors={['#697565', '#ECDFCC']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1.2, y: 0 }}
+                                className="flex-1 py-4 mx-2 rounded-lg items-center justify-center"
                             >
-                                <LinearGradient
-                                    colors={['#697565', '#ECDFCC']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1.2, y: 0 }}
-                                    className="flex-1 items-center justify-center rounded-full"
+                                <TouchableOpacity
+                                    className="items-center justify-center"
+                                    onPress={handleSubmit}
                                 >
                                     <Text className="text-center text-white font-semibold">Submit</Text>
-                                </LinearGradient>
-                            </TouchableOpacity>
+                                </TouchableOpacity>
+                            </LinearGradient>
                         </View>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                visible={noItemsModalVisible}
+                animationType="fade"
+                transparent
+                onRequestClose={() => setNoItemsModalVisible(false)}
+            >
+                <View className="flex-1 justify-center items-center bg-gray-400 opacity-80">
+                    <View className="w-4/5 bg-white rounded-xl p-6 items-center shadow-lg">
+                        <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                            Tidak ada item yang diposting, silahkan tambahkan item yang ingin ditukar terlebih dahulu.
+                        </Text>
+                        <TouchableOpacity
+                           className="bg-[#4A4A4A] rounded-lg py-2 px-4"
+                            onPress={handleAddItemNavigation}
+                        >
+                            <Text className="text-white font-semibold">Tambah Item</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>

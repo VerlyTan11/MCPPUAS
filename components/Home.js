@@ -86,8 +86,8 @@ const Home = ({ navigation }) => {
 
     const renderHeader = () => (
         <View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <View className="flex-row items-center bg-gray-100 rounded-lg flex-1 px-4 py-2">
+            <View className="flex-row items-center justify-between mb-4">
+                <View className="flex-row items-center bg-gray-100 rounded-lg flex-1 px-4">
                     <TextInput
                         ref={inputRef}
                         className="flex-1 text-base"
@@ -98,7 +98,7 @@ const Home = ({ navigation }) => {
                         onChangeText={handleSearchChange}
                         returnKeyType="search"
                         onSubmitEditing={triggerSearch}
-                        blurOnSubmit={false}
+                        submitBehavior="blur"
                     />
                     <TouchableOpacity onPress={triggerSearch}>
                         <Image
@@ -119,8 +119,7 @@ const Home = ({ navigation }) => {
                                 ? { uri: profileImageUrl }
                                 : require('../assets/profile.png')
                         }
-                        style={{ width: 32, height: 32, borderRadius: 16 }}
-                        resizeMode="cover"
+                        className="w-6 h-6"
                     />
                 </TouchableOpacity>
             </View>
@@ -135,32 +134,19 @@ const Home = ({ navigation }) => {
                     overflow: 'hidden',
                 }}
             >
-                <View style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    borderRadius: 16,
-                    padding: 16,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                }}>
-                    <View style={{ flex: 1, marginRight: 12 }}>
-                        <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white', marginBottom: 4 }}>
+                <View className="bg-white opacity-90 rounded-xl p-4 flex-row items-center justify-between">
+                    <View className="flex-1 mr-3">
+                        <Text className="text-xl font-bold text-black mb-1">
                             Explore Item's
                         </Text>
-                        <Text style={{ color: 'white', fontSize: 14, marginBottom: 12 }}>
+                        <Text className="text-black text-sm mb-3">
                             Tukarkan dengan apa yang Anda inginkan
                         </Text>
                         <TouchableOpacity
-                            style={{
-                                backgroundColor: '#4A4A4A',
-                                borderRadius: 8,
-                                paddingVertical: 8,
-                                paddingHorizontal: 16,
-                                alignSelf: 'flex-start',
-                            }}
+                            className="bg-[#4A4A4A] rounded-lg py-2 px-4 self-start"
                             onPress={() => navigation.navigate('AddItem')}
                         >
-                            <Text style={{ color: 'white', textAlign: 'center' }}>Mulai Barter</Text>
+                            <Text className="text-white text-center">Mulai Barter</Text>
                         </TouchableOpacity>
                     </View>
                     <Image
@@ -176,13 +162,13 @@ const Home = ({ navigation }) => {
                     <View key={index} className="flex-col items-center mb-4">
                         <TouchableOpacity
                             onPress={() => handleCategorySelect(item.value)}
-                            className="py-2 px-4 rounded-md"
+                            className="p-2 rounded-md"
                         >
                             <LinearGradient
                                 colors={selectedCategory === item.value ? ['#697565', '#ECDFCC'] : ['#f1f1f1', '#f1f1f1']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1.2, y: 0 }}
-                                className="rounded-md p-3"
+                                className="rounded-md p-4"
                                 style={{
                                     borderRadius: 16,
                                     overflow: 'hidden',

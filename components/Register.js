@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Register = () => {
     const navigation = useNavigation();
@@ -51,12 +52,12 @@ const Register = () => {
                     resizeMode="contain"
                 />
 
-                <Text className="text-xl font-bold text-black mb-8">Sign Up With Email</Text>
+                <Text className="text-xl font-bold text-black">Sign Up With Email</Text>
                 <Text className="text-center text-gray-400 text-grey mb-8">
                     Get barter for your items with everyone by signing up for our barter app!
                 </Text>
 
-                <View className="w-full">
+                <View className="w-full mb-8">
                     <Text className="text-gray-400 mb-2">Name</Text>
                     <TextInput
                         value={name}
@@ -102,12 +103,27 @@ const Register = () => {
                 </View>
 
 
-                <TouchableOpacity
-                    onPress={handleRegister}
-                    className="w-full bg-gray-100 p-3 mb-4 rounded-full"
+                <LinearGradient
+                colors={['#697565', '#ECDFCC']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1.2, y: 0 }}
+                style={{
+                    borderRadius: 16,
+                }}
+                className="flex-row items-center justify-center rounded-lg shadow-md mb-4"
+            >
+                <TouchableOpacity 
+                    onPress={handleRegister} 
+                    style={{ 
+                        width: '100%',
+                        marginBottom: 16, 
+                        borderRadius: 24, 
+                        marginTop: 16
+                    }}
                 >
-                    <Text className="text-gray-500 text-center">Create an account</Text>
+                    <Text className="color-white text-center">Log in</Text>
                 </TouchableOpacity>
+            </LinearGradient>
 
                 <TouchableOpacity onPress={() => navigation.navigate('Login')} className="flex-row">
                     <Text className="text-gray-600">Have an account?</Text>

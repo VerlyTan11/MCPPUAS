@@ -184,8 +184,20 @@ const EditProfile = () => {
     }
   };
 
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
   return (
     <ScrollView className="flex-1 p-8 bg-white">
+      <View className="flex-row mb-8 items-center">
+        <TouchableOpacity onPress={handleBackPress}>
+          <Image source={require('../assets/back.png')} className="w-10 h-10" />
+        </TouchableOpacity>
+        <View className="flex-1 justify-center mr-10">
+          <Text className="text-xl font-semibold text-center">Edit Profile</Text>
+        </View>
+      </View>
       <View className="flex-row items-center mb-4">
         <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
           <TouchableOpacity onPress={handleImagePicker}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -8,6 +8,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/authSlice';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Login = () => {
     const [isBiometricSupported, setIsBiometricSupported] = useState(false);
@@ -17,151 +18,119 @@ const Login = () => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const dispatch = useDispatch();
 
-    const handleLogin = async () => {
-        if (!email || !password) {
-            alert('Please enter both email and password');
-            return;
-        }
-    
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+    // Modal states
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
 
-            dispatch(setUser({ uid: user.uid, email: user.email }));
-
-            await AsyncStorage.setItem('userEmail', email);
-    
-            const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
-            if (!isBiometricAvailable) {
-                alert('Biometric authentication is not supported on this device.');
-                navigation.navigate('Home');
-                return;
-            }
-    
-            const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
-            if (!savedBiometrics) {
-                alert('No biometric record found. Proceeding without biometric verification.');
-                navigation.navigate('Home');
-                return;
-            }
-    
-            const biometricAuth = await LocalAuthentication.authenticateAsync({
-                promptMessage: 'Verify your identity',
-                cancelLabel: 'Cancel',
-                disableDeviceFallback: true,
-            });
-    
-            if (biometricAuth.success) {
-                alert('Biometric verification successful!');
-                navigation.navigate('Home');
-            } else {
-                alert('Biometric verification failed. Please try again.');
-            }
-        } catch (error) {
-            alert(error.message);
-        }
-    };
-    
-
-    const fallBackToDefaultAuth = () => {
-        console.log('Fallback to password authentication');
-    };
-
-    const alertComponent = (title, message, buttonText, buttonFunction) => {
-        Alert.alert(title, message, [
-            { text: buttonText, onPress: buttonFunction },
-        ]);
-    };
-
-    const TwoButtonAlert = (userEmail) =>
-        Alert.alert('Berhasil Login', '', [
-            { text: 'Back', onPress: () => console.log('Cancel pressed'), style: 'cancel' },
-            { text: 'Proceed', onPress: () => navigation.navigate('Home', { email: userEmail }) },
-        ]);
-
-    const handleBiometricAuth = async () => {
-        const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
-        if (!isBiometricAvailable) {
-            return alertComponent(
-                'Please enter your password',
-                'Biometric authentication is not supported',
-                'OK',
-                fallBackToDefaultAuth
-            );
-        }
-
-        const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
-        if (!savedBiometrics) {
-            return alertComponent(
-                'Biometric record not found',
-                'Please login with your password',
-                'OK',
-                fallBackToDefaultAuth
-            );
-        }
-
-        const biometricAuth = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Login to Bartems app',
-            cancelLabel: 'Cancel',
-            disableDeviceFallback: true,
-        });
-
-        if (biometricAuth.success) {
-            const userEmail = await AsyncStorage.getItem('userEmail');
-            if (userEmail) {
-                TwoButtonAlert(userEmail);
-            } else {
-                alert('No saved account. Please log in manually first.');
-            }
-        }
-    };
-
+    // Function to handle Biometric Check
     useEffect(() => {
-        let isMounted = true; 
+        let isMounted = true;
         (async () => {
             const compatible = await LocalAuthentication.hasHardwareAsync();
             if (isMounted) {
                 setIsBiometricSupported(compatible);
+                if (!compatible) {
+                    showModal(
+                        "Warning!",
+                        "Fingerprint scanner is unavailable on this device.",
+                        "OK"
+                    );
+                }
             }
         })();
-
         return () => {
             isMounted = false;
         };
     }, []);
 
+    const handleLogin = async () => {
+        if (!email || !password) {
+            showModal('Error', 'Please enter both email and password', 'OK');
+            return;
+        }
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            dispatch(setUser({ uid: user.uid, email: user.email }));
+            await AsyncStorage.setItem('userEmail', email);
+
+            const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
+            if (!isBiometricAvailable) {
+                showModal('Error', 'Biometric authentication is not supported on this device.', 'OK');
+                navigation.navigate('Home');
+                return;
+            }
+
+            const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
+            if (!savedBiometrics) {
+                showModal('Error', 'No biometric record found. Proceeding without biometric verification.', 'OK');
+                navigation.navigate('Home');
+                return;
+            }
+
+            const biometricAuth = await LocalAuthentication.authenticateAsync({
+                promptMessage: 'Verify your identity',
+                cancelLabel: 'Cancel',
+                disableDeviceFallback: true,
+            });
+
+            if (biometricAuth.success) {
+                showModal('Success', 'Biometric verification successful!', 'OK');
+                navigation.navigate('Home');
+            } else {
+                showModal('Error', 'Biometric verification failed. Please try again.', 'OK');
+            }
+        } catch (error) {
+            showModal('Error', error.message, 'OK');
+        }
+    };
+
+    const showModal = (title, message) => {
+        setModalTitle(title);
+        setModalMessage(message);
+        setModalVisible(true);
+
+        setTimeout(() => {
+            setModalVisible(false);
+        }, 10000);
+    };
+
+    const handleModalClose = () => {
+        setModalVisible(false);
+    };
+
     return (
-        <SafeAreaView style={{ flex: 1, alignItems: 'center', paddingHorizontal: 32, backgroundColor: 'white' }}>
+        <SafeAreaView className="flex-1 items-center px-8 bg-white">
             <Image
                 source={require('../assets/logo-bartems.png')}
                 className="w-36 h-36 mb-4"
                 resizeMode="contain"
             />
-
-            <Text style={{ fontSize: 24, fontWeight: 'bold', color: 'black', marginBottom: 32 }}>
-            Login to Bartem's
+            <Text className="text-2xl font-bold text-black">
+                Login to Bartem's
+            </Text>
+            <Text className="text-center text-gray-500 mb-8">
+                Welcome back! Sign in using your account to continue
             </Text>
 
-            <Text style={{ textAlign: 'center', color: 'gray', marginBottom: 8 }}>
-            Welcome back! Sign in using your account to continue
-            </Text>
-
-            <View className="w-full">
+            <View className="w-full mb-16 mt-8">
                 <Text className="text-gray-400">Email</Text>
                 <TextInput
                     value={email}
                     onChangeText={setEmail}
-                    className="h-20 pl-0 border-b border-gray-300 rounded mb-4"
+                    className="h-15 pl-0 border-b border-gray-300 rounded mb-12"
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
-
                 <Text className="text-gray-400">Password</Text>
                 <View className="flex-row items-center border-b border-gray-300">
                     <TextInput
                         value={password}
                         onChangeText={setPassword}
-                        className="flex-1 h-20 pl-0"
+                        className="flex-1 h-15 pl-0"
                         secureTextEntry={!isPasswordVisible}
                     />
                     <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
@@ -172,30 +141,59 @@ const Login = () => {
                 </View>
             </View>
 
-            <TouchableOpacity 
-                onPress={handleLogin} 
-                style={{ 
-                    width: '100%', 
-                    backgroundColor: '#f0f0f0', 
-                    padding: 12, 
-                    marginBottom: 16, 
-                    borderRadius: 24, 
-                    marginTop: 20
+            <LinearGradient
+                colors={['#697565', '#ECDFCC']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1.2, y: 0 }}
+                style={{
+                    borderRadius: 16,
                 }}
+                className="flex-row items-center justify-center rounded-lg shadow-md mb-4"
             >
-                <Text style={{ color: '#808080', textAlign: 'center' }}>Log in</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleLogin}
+                    style={{
+                        width: '100%',
+                        marginBottom: 16,
+                        borderRadius: 24,
+                        marginTop: 16,
+                    }}
+                >
+                    <Text className="color-white text-center">Log in</Text>
+                </TouchableOpacity>
+            </LinearGradient>
 
-            <Text>
-                {isBiometricSupported
-                    ? 'Your device is compatible with biometric!'
-                    : 'Fingerprint scanner is unavailable on this device'}
-            </Text>
+            {!isBiometricSupported && (
+                <View className="flex items-center mt-8">
+                    <Image
+                        source={require('../assets/warning.png')}
+                        className="w-16 h-16 mb-4"
+                        resizeMode="contain"
+                    />
+                    <Text className="text-red-600 font-bold text-center">
+                        Fingerprint scanner is unavailable on this device
+                    </Text>
+                </View>
+            )}
 
             <TouchableOpacity onPress={() => navigation.navigate('Register')} className="flex-row">
                 <Text className="text-gray-600 mt-2">Don't have an account? </Text>
                 <Text className="text-black font-bold mt-2">Sign Up</Text>
             </TouchableOpacity>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={handleModalClose}
+            >
+                <View className="flex-1 justify-center items-center bg-gray-400 opacity-90">
+                    <View className="bg-white p-6 rounded-lg items-center">
+                        <Text className="text-xl font-bold text-black mb-4">{modalTitle}</Text>
+                        <Text className="text-lg text-black mb-4">{modalMessage}</Text>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 };
