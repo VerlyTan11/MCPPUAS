@@ -1,23 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db } from '../firebaseConfig';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import debounce from 'lodash.debounce';
-import { useSelector } from 'react-redux';
 
-const ItemsProp = ({ excludeUserId }) => {
+const ItemsProp = ({ excludeUserId, filterCategory, searchQuery }) => {
     const navigation = useNavigation();
     const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const filterCategory = useSelector((state) => state.category.selected);
-    const searchQuery = useSelector((state) => state.search.query);
 
     useEffect(() => {
         let productsRef = collection(db, 'products');
-
         if (filterCategory) {
             productsRef = query(
                 productsRef,
@@ -31,19 +24,22 @@ const ItemsProp = ({ excludeUserId }) => {
         const unsubscribe = onSnapshot(
             productsRef,
             (querySnapshot) => {
-                const productsList = [];
+                let productsList = [];
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     if (data.nama_product && data.image_url && data.userId !== excludeUserId) {
-                        productsList.push({
-                            id: doc.id,
-                            ...data,
-                        });
+                        productsList.push({ id: doc.id, ...data });
                     }
                 });
 
+                // Filter by search query
+                if (searchQuery) {
+                    productsList = productsList.filter((product) =>
+                        product.nama_product.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                }
+
                 setProducts(productsList);
-                setFilteredProducts(productsList);
                 setLoading(false);
             },
             (error) => {
@@ -53,50 +49,27 @@ const ItemsProp = ({ excludeUserId }) => {
         );
 
         return () => unsubscribe();
-    }, [excludeUserId, filterCategory]);
-
-    const debouncedFilter = useMemo(
-        () =>
-            debounce((query) => {
-                if (query.trim()) {
-                    setFilteredProducts(
-                        products.filter((product) =>
-                            product.nama_product.toLowerCase().includes(query.toLowerCase())
-                        )
-                    );
-                } else {
-                    setFilteredProducts(products);
-                }
-            }, 100),
-        [products]
-    );
-
-    useEffect(() => {
-        debouncedFilter(searchQuery);
-        return () => debouncedFilter.cancel();
-    }, [searchQuery, debouncedFilter]);
+    }, [excludeUserId, filterCategory, searchQuery]);
 
     if (loading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: 'gray', fontSize: 16 }}>Loading...</Text>
+            <View className="flex-1 justify-center items-center">
+                <Text className="text-gray-500 text-lg">Loading...</Text>
             </View>
         );
     }
 
-    if (filteredProducts.length === 0) {
+    if (products.length === 0) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', color: 'gray' }}>
-                    Tidak ada barang yang ditemukan.
-                </Text>
+            <View className="flex-1 justify-center items-center mt-5">
+                <Text className="text-lg font-bold text-gray-500">Tidak ada barang yang ditemukan.</Text>
             </View>
         );
     }
 
     return (
         <FlatList
-            data={filteredProducts}
+            data={products}
             keyExtractor={(item) => item.id}
             numColumns={3}
             columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 10 }}
@@ -109,31 +82,14 @@ const ItemsProp = ({ excludeUserId }) => {
                             itemId: item.id,
                         })
                     }
-                    style={{
-                        backgroundColor: 'white',
-                        borderRadius: 10,
-                        shadowColor: '#000',
-                        shadowOpacity: 0.1,
-                        elevation: 3,
-                        padding: 8,
-                        width: '30%',
-                    }}
+                    className="bg-white rounded-lg shadow p-2 w-[30%]"
                 >
-                    {item.image_url && (
-                        <Image
-                            source={{ uri: item.image_url }}
-                            style={{
-                                width: '100%',
-                                height: 80,
-                                borderRadius: 8,
-                                marginBottom: 8,
-                            }}
-                            resizeMode="cover"
-                        />
-                    )}
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: 'black', textAlign: 'center' }}>
-                        {item.nama_product}
-                    </Text>
+                    <Image
+                        source={{ uri: item.image_url }}
+                        className="w-full h-20 rounded mb-2"
+                        resizeMode="cover"
+                    />
+                    <Text className="text-sm font-semibold text-black text-center">{item.nama_product}</Text>
                 </TouchableOpacity>
             )}
         />
