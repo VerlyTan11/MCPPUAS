@@ -15,6 +15,7 @@ const PilihItem = () => {
     const [inputQty, setInputQty] = useState('');
     const [exchangeQty, setExchangeQty] = useState('');
     const [noItemsModalVisible, setNoItemsModalVisible] = useState(false);
+    const [isPressed, setIsPressed] = useState(false);
 
     useEffect(() => {
         const fetchUserProducts = async () => {
@@ -155,26 +156,24 @@ const PilihItem = () => {
                             value={exchangeQty}
                             onChangeText={setExchangeQty}
                         />
-                        <View className="flex-row justify-between w-full">
+                       <View className="flex-row justify-between w-full">
+                            {/* Cancel Button */}
                             <TouchableOpacity
-                                className="flex-1 bg-gray-300 py-3"
+                                className="flex-1 bg-gray-300 py-3 rounded-lg" // Added rounded-lg for the cancel button
                                 onPress={() => setModalVisible(false)}
                             >
                                 <Text className="text-center text-gray-700 font-semibold">Cancel</Text>
                             </TouchableOpacity>
-                            <LinearGradient
-                                colors={['#697565', '#ECDFCC']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1.2, y: 0 }}
-                                className="flex-1 py-4 mx-2 rounded-lg items-center justify-center"
+
+                            {/* Submit Button */}
+                            <TouchableOpacity
+                                className={`flex-1 py-4 mx-2 items-center justify-center rounded-lg ${isPressed ? 'bg-[#697565]' : 'bg-gray-300'}`} // Added rounded-lg for the submit button
+                                onPressIn={() => setIsPressed(true)}
+                                onPressOut={() => setIsPressed(false)}
+                                onPress={handleSubmit}
                             >
-                                <TouchableOpacity
-                                    className="items-center justify-center"
-                                    onPress={handleSubmit}
-                                >
-                                    <Text className="text-center text-white font-semibold">Submit</Text>
-                                </TouchableOpacity>
-                            </LinearGradient>
+                                <Text className="text-center text-gray-700 font-semibold">Submit</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>

@@ -236,7 +236,7 @@ const AddItem = () => {
                     className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
                 />
 
-                <Text className="text-gray-800 font-semibold mb-2">Lokasi</Text>
+                <Text className="text-gray-800 font-semibold mb-2 ml-1">Lokasi</Text>
                 <TextInput 
                     placeholder="Alamat Lengkap" 
                     value={formData.alamat}

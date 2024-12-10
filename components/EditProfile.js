@@ -198,6 +198,8 @@ const EditProfile = () => {
           <Text className="text-xl font-semibold text-center">Edit Profile</Text>
         </View>
       </View>
+
+      {/* Nama */}
       <View className="flex-row items-center mb-4">
         <View className="w-32 h-32 bg-gray-200 rounded-lg items-center justify-center mr-4">
           <TouchableOpacity onPress={handleImagePicker}>
@@ -229,6 +231,8 @@ const EditProfile = () => {
         />
       </View>
 
+      {/* No Telp */}
+      <Text className="text-gray-600 mb-2">No. Telp</Text>
       <TextInput
         placeholder="No. Telp"
         value={telp}
@@ -239,6 +243,8 @@ const EditProfile = () => {
         className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
       />
 
+      {/* Email */}
+      <Text className="text-gray-600 mb-2">Email</Text>
       <TextInput 
         placeholder="Email" 
         value={email}
