@@ -26,6 +26,7 @@ const AddItem = () => {
         kode_pos: '',
         nama_product: '',
         no_rumah: '',
+        preferensi: '',
     });
 
     const handleImagePicker = async () => {
@@ -41,7 +42,7 @@ const AddItem = () => {
                     text: "Kamera",
                     onPress: async () => {
                         const result = await ImagePicker.launchCameraAsync({
-                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            mediaTypes: [ImagePicker.MediaType.IMAGE], // Menggunakan array dengan MediaType
                             allowsEditing: true,
                             aspect: [4, 3],
                             quality: 1,
@@ -55,7 +56,7 @@ const AddItem = () => {
                     text: "Galeri",
                     onPress: async () => {
                         const result = await ImagePicker.launchImageLibraryAsync({
-                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                            mediaTypes: [ImagePicker.MediaType.IMAGE], // Menggunakan MediaType
                             allowsEditing: true,
                             aspect: [4, 3],
                             quality: 1,
@@ -209,9 +210,9 @@ const AddItem = () => {
                         <Picker.Item label="Pilih Jenis Produk" value="" color="#888" style={{ fontSize: 14 }} />
                         <Picker.Item label="Kardus" value="kardus" style={{ fontSize: 14 }} />
                         <Picker.Item label="Kain" value="kain" style={{ fontSize: 14 }} />
-                        <Picker.Item label="Kamera" value="kamera" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Elektronik" value="elektronik" style={{ fontSize: 14 }} />
                         <Picker.Item label="Buku" value="buku" style={{ fontSize: 14 }} />
-                        <Picker.Item label="More" value="more" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Lainnya" value="lainnya" style={{ fontSize: 14 }} />
                     </Picker>
                 </View>
 
@@ -243,7 +244,7 @@ const AddItem = () => {
                     onChangeText={(value) => handleInputChange('alamat', value)}
                     className="bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mb-4"
                 />
-                <View className="flex-row mb-12">
+                <View className="flex-row mb-4">
                     <TextInput 
                         placeholder="No. Rumah" 
                         value={formData.no_rumah}
@@ -256,6 +257,21 @@ const AddItem = () => {
                         onChangeText={(value) => handleInputChange('kode_pos', value)}
                         className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3"
                     />
+                </View>
+
+                <Text className="text-gray-800 font-semibold mb-2 ml-1">Preferensi Penukaran</Text>
+                <View className="bg-gray-100 rounded-lg mb-12">
+                    <Picker
+                        selectedValue={formData.preferensi}
+                        onValueChange={(value) => handleInputChange('preferensi', value)}
+                    >
+                        <Picker.Item label="Pilih Jenis Produk Yang Diinginkan" value="" color="#888" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Kardus" value="kardus" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Kain" value="kain" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Elektronik" value="elektronik" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Buku" value="buku" style={{ fontSize: 14 }} />
+                        <Picker.Item label="Lainnya" value="lainnya" style={{ fontSize: 14 }} />
+                    </Picker>
                 </View>
 
                 <LinearGradient
