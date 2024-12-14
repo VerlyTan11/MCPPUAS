@@ -42,7 +42,7 @@ const AddItem = () => {
                     text: "Kamera",
                     onPress: async () => {
                         const result = await ImagePicker.launchCameraAsync({
-                            mediaTypes: [ImagePicker.MediaType.IMAGE], // Menggunakan array dengan MediaType
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
                             allowsEditing: true,
                             aspect: [4, 3],
                             quality: 1,
@@ -56,7 +56,7 @@ const AddItem = () => {
                     text: "Galeri",
                     onPress: async () => {
                         const result = await ImagePicker.launchImageLibraryAsync({
-                            mediaTypes: [ImagePicker.MediaType.IMAGE], // Menggunakan MediaType
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images,
                             allowsEditing: true,
                             aspect: [4, 3],
                             quality: 1,
@@ -111,6 +111,9 @@ const AddItem = () => {
     };
 
     const handleInputChange = (field, value) => {
+        if (field === 'jumlah') {
+            value = Number(value); // Convert jumlah to number
+        }
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
@@ -139,6 +142,9 @@ const AddItem = () => {
                 timestamp: new Date().toISOString(),
                 userId: user.uid,
             };
+
+            // Ensure jumlah is a number before sending to Firebase
+            data.jumlah = Number(data.jumlah); // Ensure jumlah is a number
 
             const docRef = await addDoc(collection(db, 'products'), data);
 
@@ -222,12 +228,14 @@ const AddItem = () => {
                         value={formData.jumlah}
                         onChangeText={(value) => handleInputChange('jumlah', value)}
                         className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 mr-2 text-center"
+                        keyboardType="numeric"
                     />
                     <TextInput 
                         placeholder="Berat / pcs | kg" 
                         value={formData.berat}
                         onChangeText={(value) => handleInputChange('berat', value)}
                         className="flex-1 bg-gray-100 text-gray-600 rounded-lg px-4 py-3 text-center"
+                        keyboardType="numeric"
                     />
                 </View>
                 <TextInput 

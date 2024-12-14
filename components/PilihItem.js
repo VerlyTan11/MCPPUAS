@@ -113,17 +113,25 @@ const PilihItem = () => {
                     userProducts.map((product) => (
                         <TouchableOpacity
                             key={product.id}
-                            className="items-center mb-6"
-                            onPress={() => handleSelectProduct(product)}
+                            className={`items-center mb-6 ${product.jumlah === '0' ? 'opacity-50' : ''}`}
+                            onPress={product.jumlah !== '0' ? () => handleSelectProduct(product) : null}
+                            activeOpacity={product.jumlah === '0' ? 1 : 0.7}
                         >
-                            <Image
-                                source={
-                                    product.image_url
-                                        ? { uri: product.image_url }
-                                        : require('../assets/kardus.jpg')
-                                }
-                                className="w-24 h-24 rounded-lg mb-2"
-                            />
+                            <View className="relative">
+                                <Image
+                                    source={
+                                        product.image_url
+                                            ? { uri: product.image_url }
+                                            : require('../assets/kardus.jpg')
+                                    }
+                                    className="w-24 h-24 rounded-lg mb-2"
+                                />
+                                {product.jumlah === '0' && (
+                                    <View className="absolute inset-0 bg-red-600 opacity-100 flex justify-center items-center rounded-lg">
+                                        <Text className="text-white text-lg font-semibold">Habis</Text>
+                                    </View>
+                                )}
+                            </View>
                             <Text className="text-gray-800">{product.nama_product}</Text>
                             <Text className="text-gray-500">Stok: {product.jumlah}</Text>
                         </TouchableOpacity>
@@ -132,7 +140,6 @@ const PilihItem = () => {
                     <Text className="text-center text-gray-500 mb-6">Tidak ada item yang diposting.</Text>
                 )}
             </View>
-
             <Modal
                 visible={modalVisible}
                 animationType="slide"

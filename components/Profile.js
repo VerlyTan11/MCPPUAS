@@ -165,16 +165,26 @@ const Profile = () => {
               onPress={() => navigation.navigate('ItemDetail', { itemId: item.id })}
               style={{ width: '48%' }}
             >
-              <Image 
-                source={item.image_url ? { uri: item.image_url } : require('../assets/kardus.jpg')}
-                style={{
-                  width: '100%',
-                  height: 150,
-                  borderRadius: 10,
-                  backgroundColor: '#ccc',
-                }}
-                resizeMode="cover"
-              />
+              <View style={{ position: 'relative' }}>
+                <Image 
+                  source={item.image_url ? { uri: item.image_url } : require('../assets/kardus.jpg')}
+                  style={{
+                    width: '100%',
+                    height: 150,
+                    borderRadius: 10,
+                    backgroundColor: '#ccc',
+                  }}
+                  resizeMode="cover"
+                />
+                
+                {item.jumlah === 0 && (
+                  <View 
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 justify-center items-center bg-red-600 opacity-80 bg-opacity-50 p-2 rounded-md"
+                  >
+                    <Text className="text-white text-lg font-bold">Habis</Text>
+                  </View>
+                )}
+              </View>
             </TouchableOpacity>
           )}
         />

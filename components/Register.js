@@ -12,36 +12,37 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [telp, setTelp] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
     const handleRegister = async () => {
-        if (!name || !email || !password || !confirmPassword) {
+        if (!name || !email || !password || !confirmPassword || !telp) {
             alert('Please fill all fields');
             return;
         }
-    
+
         if (password !== confirmPassword) {
             alert('Passwords do not match');
             return;
         }
-    
+
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const { uid } = userCredential.user;
-    
+
             await setDoc(doc(db, 'users', uid), {
-                name,  
+                name,
                 email,
+                telp,
             });
-    
+
             alert('Account created successfully!');
             navigation.navigate('Login');
         } catch (error) {
             alert(error.message);
         }
     };
-    
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
@@ -75,6 +76,15 @@ const Register = () => {
                         autoCapitalize="none"
                     />
 
+                    <Text className="text-gray-400 mb-2">Phone Number</Text>
+                    <TextInput
+                        value={telp}
+                        onChangeText={setTelp}
+                        className="h-12 border-b border-gray-300 mb-4 pl-0"
+                        keyboardType="phone-pad"
+                        autoCapitalize="none"
+                    />
+
                     <Text className="text-gray-400 mb-2">Password</Text>
                     <View className="flex-row items-center border-b border-gray-300 mb-4">
                         <TextInput
@@ -102,28 +112,27 @@ const Register = () => {
                     </View>
                 </View>
 
-
                 <LinearGradient
-                colors={['#697565', '#ECDFCC']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1.2, y: 0 }}
-                style={{
-                    borderRadius: 16,
-                }}
-                className="flex-row items-center justify-center rounded-lg shadow-md mb-4"
-            >
-                <TouchableOpacity 
-                    onPress={handleRegister} 
-                    style={{ 
-                        width: '100%',
-                        marginBottom: 16, 
-                        borderRadius: 24, 
-                        marginTop: 16
+                    colors={['#697565', '#ECDFCC']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1.2, y: 0 }}
+                    style={{
+                        borderRadius: 16,
                     }}
+                    className="flex-row items-center justify-center rounded-lg shadow-md mb-4"
                 >
-                    <Text className="color-white text-center">Log in</Text>
-                </TouchableOpacity>
-            </LinearGradient>
+                    <TouchableOpacity 
+                        onPress={handleRegister} 
+                        style={{ 
+                            width: '100%',
+                            marginBottom: 16, 
+                            borderRadius: 24, 
+                            marginTop: 16
+                        }}
+                    >
+                        <Text className="color-white text-center">Sign Up</Text>
+                    </TouchableOpacity>
+                </LinearGradient>
 
                 <TouchableOpacity onPress={() => navigation.navigate('Login')} className="flex-row">
                     <Text className="text-gray-600">Have an account?</Text>

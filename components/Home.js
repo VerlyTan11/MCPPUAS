@@ -90,12 +90,14 @@ const Home = ({ navigation }) => {
                 let productsList = [];
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    if (data.nama_product && data.image_url && data.userId !== currentUser?.uid) {
+
+                    // Menyertakan semua produk, termasuk milik user sendiri
+                    if (data.nama_product && data.image_url && data.jumlah !== 0) {
                         productsList.push({ id: doc.id, ...data });
                     }
                 });
 
-                // Apply search filter
+                // Terapkan filter pencarian jika teks pencarian disediakan
                 if (searchText) {
                     productsList = productsList.filter((product) =>
                         product.nama_product.toLowerCase().includes(searchText.toLowerCase())
@@ -114,54 +116,57 @@ const Home = ({ navigation }) => {
         return () => unsubscribe();
     }, [selectedCategory, searchText, currentUser?.uid]);
 
+
     const handleCategorySelect = (category) => {
         dispatch(setCategory(category === selectedCategory ? null : category));
     };
 
         useEffect(() => {
-        const fetchUserItems = async () => {
-            try {
-                const userItemsRef = query(
-                    collection(db, 'products'),
-                    where('userId', '==', currentUser?.uid)
-                );
-                const querySnapshot = await getDocs(userItemsRef);
+            if (!currentUser) return;
+
+            // Fungsi untuk memantau perubahan barang milik user
+            const userItemsRef = query(
+                collection(db, 'products'),
+                where('userId', '==', currentUser.uid)
+            );
+
+            const unsubscribe = onSnapshot(userItemsRef, (querySnapshot) => {
                 const items = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
                 }));
                 setUserItems(items);
-            } catch (error) {
+            }, (error) => {
                 console.error('Error fetching user items:', error);
-            }
-        };
+            });
 
-        if (currentUser) fetchUserItems();
-    }, [currentUser]);
+            return () => unsubscribe(); // Membersihkan listener ketika komponen unmount
+        }, [currentUser]);
 
         useEffect(() => {
-        const fetchPreferences = async () => {
-            if (!selectedItem) return;
+            const fetchPreferences = async () => {
+                if (!selectedItem) return;
 
-            try {
-                const item = userItems.find((item) => item.id === selectedItem);
-                const preferencesRef = query(
-                    collection(db, 'products'),
-                    where('jenis', '==', item?.preferensi || '')
-                );
-                const querySnapshot = await getDocs(preferencesRef);
-                const preferencesList = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setPreferences(preferencesList);
-            } catch (error) {
-                console.error('Error fetching preferences:', error);
-            }
-        };
+                try {
+                    const item = userItems.find((item) => item.id === selectedItem);
+                    const preferencesRef = query(
+                        collection(db, 'products'),
+                        where('jenis', '==', item?.preferensi || '')
+                    );
+                    const querySnapshot = await getDocs(preferencesRef);
+                    const preferencesList = querySnapshot.docs.map((doc) => ({
+                        id: doc.id,
+                        ...doc.data(),
+                    }));
+                    setPreferences(preferencesList);
+                } catch (error) {
+                    console.error('Error fetching preferences:', error);
+                }
+            };
 
-        fetchPreferences();
-    }, [selectedItem, userItems]);
+            fetchPreferences();
+        }, [selectedItem, userItems]);
+
 
     const renderHeader = () => (
         <View>
