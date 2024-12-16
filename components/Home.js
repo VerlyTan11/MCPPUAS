@@ -209,7 +209,7 @@ const Home = ({ navigation }) => {
                         <Text className="text-xl font-bold text-black mb-1">Explore Item's</Text>
                         <Text className="text-black text-sm mb-3">Tukarkan dengan apa yang Anda inginkan</Text>
                         <TouchableOpacity
-                            className="bg-[#4A4A4A] rounded-lg py-2 px-4 self-start"
+                            className="bg-[#697565] rounded-lg py-2 px-4 self-start"
                             onPress={() => {
                                 preferencesRef.current?.measureLayout(
                                     scrollViewRef.current,
