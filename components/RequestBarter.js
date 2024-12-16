@@ -317,7 +317,7 @@ const RequestBarter = ({ visible, onClose }) => {
                             <FlatList
                                 data={activeTab === 'requests' ? requests : history}
                                 renderItem={activeTab === 'requests' ? renderRequests : renderHistory}
-                                keyExtractor={(item) => item.id}
+                                keyExtractor={(item, index) => `${item.id}_${index}`} // Key extractor memastikan unik
                                 ListEmptyComponent={
                                     <Text className="text-center text-gray-600 mt-4">
                                         Belum ada {activeTab === 'requests' ? 'permintaan' : 'riwayat'} barter.

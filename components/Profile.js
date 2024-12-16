@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, Pressable, FlatList } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Modal, Pressable, FlatList, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { db, auth } from '../firebaseConfig';
 import { doc, deleteDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -68,7 +68,14 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    navigation.navigate('Login'); 
+    Alert.alert(
+      'Logout Confirmation',
+      'Are you sure you want to logout?',
+      [
+        { text: 'No', style: 'cancel' },
+        { text: 'Yes', onPress: () => navigation.navigate('Login') },
+      ]
+    );
     setModalVisible(false);
   };
 
@@ -80,20 +87,32 @@ const Profile = () => {
       return;
     }
 
-    try {
-      await deleteDoc(doc(db, 'users', user.uid));
-      await user.delete();
-      navigation.navigate('Login');
-      setModalVisible(false);
-      alert('Account successfully deleted');
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      if (error.code === 'auth/requires-recent-login') {
-        alert('You need to log in again to delete your account.');
-      } else {
-        alert('An error occurred while deleting the account.');
-      }
-    }
+    Alert.alert(
+      'Delete Account Confirmation',
+      'Are you sure you want to delete your account? This action cannot be undone.',
+      [
+        { text: 'No', style: 'cancel' },
+        { 
+          text: 'Yes', 
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'users', user.uid));
+              await user.delete();
+              navigation.navigate('Login');
+              setModalVisible(false);
+              alert('Account successfully deleted');
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              if (error.code === 'auth/requires-recent-login') {
+                alert('You need to log in again to delete your account.');
+              } else {
+                alert('An error occurred while deleting the account.');
+              }
+            }
+          }
+        },
+      ]
+    );
   };
 
   if (loading) {
