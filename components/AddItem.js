@@ -112,7 +112,7 @@ const AddItem = () => {
 
     const handleInputChange = (field, value) => {
         if (field === 'jumlah') {
-            value = Number(value); // Convert jumlah to number
+            value = Number(value);
         }
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
@@ -123,39 +123,52 @@ const AddItem = () => {
             Alert.alert('Error', 'User not logged in');
             return;
         }
-
-        if (!formData.jenis) {
-            Alert.alert('Error', 'Harap pilih jenis produk terlebih dahulu!');
+    
+        const requiredFields = [
+            'nama_product',
+            'jenis',
+            'jumlah',
+            'berat',
+            'catatan',
+            'alamat',
+            'no_rumah',
+            'kode_pos',
+            'preferensi',
+        ];
+    
+        const isFormValid = requiredFields.every((field) => formData[field]?.toString().trim() !== '');
+        if (!isFormValid || !selectedImage) {
+            Alert.alert(
+                'Error',
+                'Harap isi semua field dan pilih gambar sebelum melanjutkan.'
+            );
             return;
         }
-
+    
         try {
             setIsUploading(true);
             let imageUrl = '';
             if (selectedImage) {
                 imageUrl = await handleImageUpload(selectedImage);
             }
-
+    
             const data = {
                 ...formData,
                 image_url: imageUrl,
                 timestamp: new Date().toISOString(),
                 userId: user.uid,
             };
-
-            // Ensure jumlah is a number before sending to Firebase
-            data.jumlah = Number(data.jumlah); // Ensure jumlah is a number
-
+    
+            data.jumlah = Number(data.jumlah);
+    
             const docRef = await addDoc(collection(db, 'products'), data);
-
+    
             dispatch(addItem({ id: docRef.id, ...data }));
-
+    
             setIsUploading(false);
-
-            // Tampilkan modal sukses
+    
             setIsSuccessModalVisible(true);
-
-            // Tutup modal dan pindah ke halaman lain setelah delay
+    
             setTimeout(() => {
                 setIsSuccessModalVisible(false);
                 navigation.navigate('Home');
@@ -165,7 +178,7 @@ const AddItem = () => {
             setIsUploading(false);
             Alert.alert('Error', 'Failed to add product');
         }
-    };
+    };    
 
     const handleBackPress = () => {
         navigation.goBack();
